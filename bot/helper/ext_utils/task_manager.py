@@ -23,6 +23,8 @@ from ..telegram_helper.button_build import ButtonMaker
 
 
 async def stop_duplicate_check(listener):
+    if getattr(listener, "skip_stop_duplicate", False):
+        return False, None
     is_stremio = getattr(listener, "is_stremio", False)
     if (
         (isinstance(listener.up_dest, int) and not is_stremio)

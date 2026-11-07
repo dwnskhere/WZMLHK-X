@@ -84,6 +84,8 @@ class Clone(TaskListener):
             "-up": "",
             "-rcf": "",
             "-sync": False,
+            "-ssd": False,
+            "-dup": False,
         }
 
         arg_parser(input_list[1:], args)
@@ -97,6 +99,7 @@ class Clone(TaskListener):
         self.rc_flags = args["-rcf"]
         self.link = args["link"]
         self.name = args["-n"]
+        self.skip_stop_duplicate = args["-ssd"] or args["-dup"]
 
         is_bulk = args["-b"]
         sync = args["-sync"]
