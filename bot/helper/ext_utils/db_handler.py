@@ -304,5 +304,70 @@ class DbManager:
 
         return all_items[:limit]
 
+    async def check_stremio_duplicate(self, name):
+        """Check if a file/folder/title exists in the Telegram-Stremio MongoDB database."""
+        if not Config.STREMIO_DB_URL or not name:
+            return None
+
+        urls = [
+            u.strip()
+            for u in str(Config.STREMIO_DB_URL).replace(",", " ").split()
+            if u.strip()
+        ]
+        if not urls:
+            return None
+
+        import re
+
+        clean_name = re.sub(
+            r"(\.part\d+|\.00\d+|\.zip|\.rar|\.7z|\.mkv|\.mp4|\.avi)$",
+            "",
+            name,
+            flags=re.IGNORECASE,
+        ).strip()
+        escaped_clean = re.escape(clean_name)
+        escaped_exact = re.escape(name.strip())
+
+        query = {
+            "$or": [
+                {"file_name": {"$regex": f"^{escaped_exact}$", "$options": "i"}},
+                {"filename": {"$regex": f"^{escaped_exact}$", "$options": "i"}},
+                {"name": {"$regex": f"^{escaped_exact}$", "$options": "i"}},
+                {"title": {"$regex": f"^{escaped_clean}$", "$options": "i"}},
+                {"title_english": {"$regex": f"^{escaped_clean}$", "$options": "i"}},
+            ]
+        }
+
+        for url in urls:
+            try:
+                client = AsyncMongoClient(url, server_api=ServerApi("1"))
+                try:
+                    default_db = client.get_default_database()
+                    dbs_to_scan = [default_db]
+                except Exception:
+                    db_names = await client.list_database_names()
+                    target_names = [
+                        d for d in db_names if d not in ("admin", "local", "config")
+                    ]
+                    dbs_to_scan = [client[d] for d in target_names]
+
+                for db in dbs_to_scan:
+                    collections = await db.list_collection_names()
+                    for coll in collections:
+                        if coll in ("admin", "local", "config"):
+                            continue
+                        doc = await db[coll].find_one(query)
+                        if doc:
+                            doc["collection"] = coll
+                            await client.close()
+                            return doc
+                await client.close()
+            except Exception as e:
+                LOGGER.error(
+                    f"Failed checking Stremio duplicate in MongoDB ({url[:20]}...): {e}"
+                )
+
+        return None
+
 
 database = DbManager()
