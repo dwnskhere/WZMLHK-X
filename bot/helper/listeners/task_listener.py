@@ -353,55 +353,137 @@ class TaskListener(TaskConfig):
                     SmartAutoRename,
                     SmartRenameLengthError,
                     SmartRenameMetadataError,
+                    SmartMediaType,
+                    parse_smart_filename,
+                    is_video_media,
+                )
+                from ..ext_utils.smart_autorename_confirmation import (
+                    request_confirmation,
                 )
 
                 smart_renamer = SmartAutoRename()
                 prefix = self.user_dict.get("LEECH_PREFIX") or Config.LEECH_PREFIX or ""
                 suffix = self.user_dict.get("LEECH_SUFFIX") or Config.LEECH_SUFFIX or ""
+                confirmation_enabled = getattr(
+                    Config, "SMART_AUTORENAME_CONFIRMATION", True
+                )
+                decision_cache = {}
+                season_groups = set()
 
-                if await aiopath.isfile(up_path):
-                    orig_name = ospath.basename(up_path)
-                    up_path, smart_meta = await smart_renamer.rename_get_meta(
-                        up_path,
-                        prefix=prefix,
-                        suffix=suffix,
-                    )
-                    if ospath.basename(up_path) != orig_name:
-                        self.file_details["orig_filename"] = orig_name
-                        self.file_details.setdefault("orig_filenames", {})[
-                            ospath.basename(up_path)
-                        ] = orig_name
-                    if smart_meta:
-                        self.file_details.setdefault("smart_metadata", {})[
-                            ospath.basename(up_path)
-                        ] = smart_meta
-                    self.name = ospath.basename(up_path)
-                elif await aiopath.isdir(up_path):
-                    orig_dict = self.file_details.setdefault("orig_filenames", {})
-                    meta_dict = self.file_details.setdefault("smart_metadata", {})
-                    for root, _, files in await sync_to_async(list, walk(up_path)):
+                is_single_media_file = await aiopath.isfile(up_path)
+                if await aiopath.isdir(up_path):
+                    walked = await sync_to_async(list, walk(up_path))
+                    media_paths = []
+                    grouped_episodes = {}
+                    for root, _, files in walked:
                         for file_ in files:
                             file_path = ospath.join(root, file_)
-                            orig_file_name = file_
-                            try:
-                                (
-                                    new_file_path,
-                                    smart_meta,
-                                ) = await smart_renamer.rename_get_meta(
-                                    file_path,
-                                    prefix=prefix,
-                                    suffix=suffix,
+                            if not await is_video_media(file_path):
+                                continue
+                            media_paths.append(file_path)
+                            ctx = parse_smart_filename(file_)
+                            if (
+                                ctx.media_type
+                                in (SmartMediaType.SINGLE_EPISODE, SmartMediaType.EPISODE_RANGE)
+                                and ctx.season is not None
+                                and ctx.title
+                            ):
+                                group_key = (
+                                    " ".join(ctx.title.casefold().split()),
+                                    ctx.year,
+                                    ctx.season,
                                 )
-                                new_file_name = ospath.basename(new_file_path)
-                                if new_file_name != orig_file_name:
-                                    orig_dict[new_file_name] = orig_file_name
-                                if smart_meta:
-                                    meta_dict[new_file_name] = smart_meta
-                            except Exception as exc:
-                                LOGGER.warning(
-                                    f"Smart Autorename skipped for {file_}: {exc}"
-                                )
+                                grouped_episodes.setdefault(group_key, []).append(file_path)
+                    season_groups = {
+                        key for key, paths in grouped_episodes.items() if len(paths) > 1
+                    }
+                    media_paths.sort()
+                else:
+                    media_paths = [up_path]
 
+                async def confirm_metadata(file_path, ctx, candidate, assessment):
+                    is_grouped_season = False
+                    group_key = None
+                    if (
+                        await aiopath.isdir(up_path)
+                        and ctx.media_type
+                        in (SmartMediaType.SINGLE_EPISODE, SmartMediaType.EPISODE_RANGE)
+                        and ctx.season is not None
+                    ):
+                        group_key = (
+                            " ".join(ctx.title.casefold().split()),
+                            ctx.year,
+                            ctx.season,
+                        )
+                        is_grouped_season = group_key in season_groups
+
+                    cache_key = ("season", *group_key) if is_grouped_season else None
+                    if cache_key and cache_key in decision_cache:
+                        return decision_cache[cache_key]
+
+                    expected_type = (
+                        "season_pack"
+                        if is_grouped_season
+                        or ctx.media_type in (
+                            SmartMediaType.EPISODE_RANGE,
+                            SmartMediaType.SEASON_PACK,
+                        )
+                        else ctx.media_type.value
+                    )
+                    decision = await request_confirmation(
+                        self,
+                        ospath.basename(file_path),
+                        ctx,
+                        candidate,
+                        assessment,
+                        expected_type=expected_type,
+                    )
+                    if cache_key and decision.get("action") != "cancel":
+                        decision_cache[cache_key] = decision
+                    return decision
+
+                for file_path in media_paths:
+                    if self.is_cancelled:
+                        return
+                    orig_name = ospath.basename(file_path)
+                    try:
+                        new_file_path, smart_meta = await smart_renamer.rename_get_meta(
+                            file_path,
+                            prefix=prefix,
+                            suffix=suffix,
+                            confirmation_callback=(
+                                confirm_metadata if confirmation_enabled else None
+                            ),
+                        )
+                        if self.is_cancelled:
+                            return
+                        new_file_name = ospath.basename(new_file_path)
+                        if new_file_name != orig_name:
+                            self.file_details.setdefault("orig_filenames", {})[
+                                new_file_name
+                            ] = orig_name
+                            if is_single_media_file:
+                                self.file_details["orig_filename"] = orig_name
+                        if is_single_media_file:
+                            up_path = new_file_path
+                            self.name = new_file_name
+                        if smart_meta:
+                            self.file_details.setdefault("smart_metadata", {})[
+                                new_file_name
+                            ] = smart_meta
+                    except SmartRenameLengthError as exc:
+                        await send_message(self.message, str(exc))
+                        return await self.on_upload_error(str(exc))
+                    except SmartRenameMetadataError as exc:
+                        LOGGER.warning(f"Smart Autorename skipped for {orig_name}: {exc}")
+                    except Exception as exc:
+                        LOGGER.warning(
+                            f"Smart Autorename skipped for {orig_name}: {exc}",
+                            exc_info=True,
+                        )
+
+                if await aiopath.isfile(up_path):
+                    self.name = ospath.basename(up_path)
                 self.size = await get_path_size(up_path)
             except SmartRenameLengthError as exc:
                 await send_message(self.message, str(exc))

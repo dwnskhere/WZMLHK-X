@@ -5,11 +5,16 @@ from logging import getLogger
 from os import path as ospath
 import re
 from typing import Optional, Tuple
+from copy import copy
 
 from aiofiles.os import rename, path as aiopath
 
 from .media_utils import get_streams, get_document_type
-from .smart_autorename_providers import CanonicalMetadataResolver, CanonicalMetadata
+from .smart_autorename_providers import (
+    CanonicalMetadataResolver,
+    CanonicalMetadata,
+    assess_canonical_candidate,
+)
 
 LOGGER = getLogger(__name__)
 
@@ -1429,6 +1434,7 @@ class SmartAutoRename:
         file_path: str,
         prefix: str = "",
         suffix: str = "",
+        confirmation_callback=None,
     ) -> Tuple[str, dict]:
         filename = ospath.basename(file_path)
         meta = {}
@@ -1465,6 +1471,62 @@ class SmartAutoRename:
                 media_type=ctx.media_type.value,
                 is_anime=ctx.is_anime,
             )
+
+        if confirmation_callback:
+            assessment = assess_canonical_candidate(
+                ctx.title,
+                ctx.year,
+                ctx.media_type.value,
+                canonical,
+                query_season=ctx.season,
+                query_episode=ctx.episode_start,
+            )
+            if assessment["confidence"] != "HIGH":
+                decision = await confirmation_callback(
+                    file_path, ctx, canonical, assessment
+                )
+                action = (decision or {}).get("action")
+                if action in ("skip", "timeout"):
+                    LOGGER.info(
+                        "Smart Autorename skipped by confirmation decision: %s",
+                        filename,
+                    )
+                    return file_path, meta
+                if action == "cancel":
+                    return file_path, meta
+                if action == "manual_tmdb":
+                    canonical = (decision or {}).get("metadata")
+                elif action != "good_to_go":
+                    LOGGER.warning(
+                        "Smart Autorename received an unknown confirmation action for %s",
+                        filename,
+                    )
+                    return file_path, meta
+
+        # A season URL is reusable for every file in that season pack. Map the
+        # current file's episode number to the exact episode title from TMDB.
+        if canonical and canonical.selection_type == "season_pack":
+            canonical = copy(canonical)
+            if ctx.season is not None:
+                canonical.season = ctx.season
+            if ctx.episode_start is not None:
+                episode_map = canonical.episode_titles or {}
+                requested_episodes = range(
+                    ctx.episode_start, (ctx.episode_end or ctx.episode_start) + 1
+                )
+                missing_episodes = [
+                    number for number in requested_episodes if number not in episode_map
+                ]
+                if missing_episodes:
+                    LOGGER.warning(
+                        "Smart Autorename skipped: TMDB season %s has no mapping for episode(s) %s in %s",
+                        ctx.season,
+                        ", ".join(map(str, missing_episodes)),
+                        filename,
+                    )
+                    return file_path, meta
+                canonical.episode = ctx.episode_start
+                canonical.episode_title = episode_map.get(ctx.episode_start) or None
 
         if canonical and canonical.season is not None and canonical.episode is not None:
             if (

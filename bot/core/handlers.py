@@ -1,6 +1,6 @@
 # ruff: noqa: F403, F405
 
-from pyrogram.filters import command, regex
+from pyrogram.filters import command, create, regex
 from pyrogram.handlers import CallbackQueryHandler, EditedMessageHandler, MessageHandler
 from pyrogram.types import BotCommand
 
@@ -9,10 +9,20 @@ from ..helper.ext_utils.help_messages import BOT_COMMANDS
 from ..helper.telegram_helper.bot_commands import BotCommands
 from ..helper.telegram_helper.filters import CustomFilters
 from ..modules import *
+from ..helper.ext_utils.smart_autorename_confirmation import (
+    smart_autorename_callback,
+    smart_autorename_url_reply,
+    is_pending_url_reply,
+)
 from .tg_client import TgClient
 
 
 def add_handlers():
+    TgClient.bot.add_handler(
+        CallbackQueryHandler(
+            smart_autorename_callback, filters=regex(r"^sac:")
+        )
+    )
     TgClient.bot.add_handler(
         MessageHandler(
             authorize,
@@ -470,6 +480,16 @@ def add_handlers():
             filters=command(BotCommands.NzbSearchCommand, case_sensitive=True)
             & CustomFilters.authorized,
         )
+    )
+    TgClient.bot.add_handler(
+        MessageHandler(
+            smart_autorename_url_reply,
+            filters=create(
+                lambda _client, message: is_pending_url_reply(message),
+                name="smart_autorename_url_reply",
+            ),
+        ),
+        group=10,
     )
     TgClient.bot.add_handler(MessageHandler(auto_leech_listener), group=10)
     if Config.SET_COMMANDS:

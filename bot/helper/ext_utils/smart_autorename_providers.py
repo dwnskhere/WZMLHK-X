@@ -69,6 +69,7 @@ def is_title_similar(query: str, res_title: str, min_ratio: float = 0.55) -> boo
 class CanonicalMetadata:
     title: Optional[str] = None
     year: Optional[str] = None
+    media_type: Optional[str] = None
     series_title: Optional[str] = None
     episode_title: Optional[str] = None
     provider: Optional[str] = None
@@ -76,6 +77,138 @@ class CanonicalMetadata:
     ott: Optional[str] = None
     season: Optional[int] = None
     episode: Optional[int] = None
+    source: Optional[str] = None
+    selection_type: Optional[str] = None
+    episode_titles: Optional[dict[int, str]] = None
+    provider_conflict: bool = False
+
+
+def _normalized_provider_title(value: Optional[str]) -> str:
+    value = re.sub(r"([a-z])([A-Z])", r"\1 \2", str(value or ""))
+    value = re.sub(r"[^a-z0-9]+", " ", value.casefold())
+    return " ".join(w for w in value.split() if w not in _STOPWORDS)
+
+
+def _providers_disagree(left: CanonicalMetadata, right: CanonicalMetadata) -> bool:
+    left_title = left.series_title or left.title
+    right_title = right.series_title or right.title
+    if left_title and right_title and _normalized_provider_title(left_title) != _normalized_provider_title(right_title):
+        return True
+    if left.year and right.year and str(left.year)[:4] != str(right.year)[:4]:
+        return True
+    if (
+        left.season is not None
+        and right.season is not None
+        and left.episode is not None
+        and right.episode is not None
+        and (left.season, left.episode) != (right.season, right.episode)
+    ):
+        return True
+    if left.media_type and right.media_type and left.media_type != right.media_type:
+        return True
+    return False
+
+
+def assess_canonical_candidate(
+    query: str,
+    query_year: Optional[str],
+    media_type: Optional[str],
+    candidate: Optional[CanonicalMetadata],
+    query_season: Optional[int] = None,
+    query_episode: Optional[int] = None,
+) -> dict:
+    """Classify a provider candidate conservatively before autorename applies it."""
+    if not candidate:
+        return {"confidence": "NONE", "reason": "no_metadata_candidate"}
+    if candidate.provider_conflict:
+        return {"confidence": "LOW", "reason": "provider_disagreement"}
+
+    expected_media_type = "movie" if media_type == "movie" else "tv"
+    if candidate.media_type and candidate.media_type != expected_media_type:
+        return {
+            "confidence": "LOW",
+            "reason": "media_type_mismatch",
+            "candidate_media_type": candidate.media_type,
+        }
+
+    if media_type == "episode_range":
+        return {
+            "confidence": "MEDIUM",
+            "reason": "episode_range_requires_season_check",
+        }
+
+    if media_type in ("single_episode", "episode_range") and query_season is not None:
+        if candidate.season is None or candidate.episode is None:
+            return {
+                "confidence": "MEDIUM",
+                "reason": "episode_coordinates_unverified",
+            }
+        if candidate.season != query_season or (
+            query_episode is not None and candidate.episode != query_episode
+        ):
+            return {
+                "confidence": "LOW",
+                "reason": "episode_coordinates_mismatch",
+            }
+
+    candidate_title = (
+        candidate.series_title or candidate.title or ""
+        if media_type in ("single_episode", "episode_range", "season_pack")
+        else candidate.title or candidate.series_title or ""
+    )
+    if not query or not candidate_title:
+        return {"confidence": "NONE", "reason": "missing_title"}
+
+    def normalize(value: str) -> str:
+        value = re.sub(r"([a-z])([A-Z])", r"\1 \2", value)
+        value = re.sub(r"[^a-z0-9]+", " ", value.casefold())
+        words = [w for w in value.split() if w not in _STOPWORDS]
+        return " ".join(words)
+
+    query_norm = normalize(query)
+    candidate_norm = normalize(candidate_title)
+    if not query_norm or not candidate_norm:
+        return {"confidence": "NONE", "reason": "unusable_title"}
+
+    query_year = str(query_year or "").strip()[:4]
+    candidate_year = str(candidate.year or "").strip()[:4]
+    if query_year and candidate_year and query_year != candidate_year:
+        return {
+            "confidence": "LOW",
+            "reason": "year_mismatch",
+            "candidate_year": candidate_year,
+        }
+
+    if query_norm == candidate_norm:
+        if query_year and not candidate_year:
+            return {
+                "confidence": "MEDIUM",
+                "reason": "candidate_year_unavailable",
+            }
+        return {"confidence": "HIGH", "reason": "exact_title_match"}
+
+    query_words = set(query_norm.split())
+    candidate_words = set(candidate_norm.split())
+    shared = query_words & candidate_words
+    overlap_query = len(shared) / max(len(query_words), 1)
+    overlap_candidate = len(shared) / max(len(candidate_words), 1)
+    sequence_ratio = SequenceMatcher(None, query_norm, candidate_norm).ratio()
+
+    # Fuzzy/franchise matches are never auto-approved. A user must verify them.
+    if len(shared) < 2 or overlap_query < 0.60 or overlap_candidate < 0.60:
+        return {
+            "confidence": "LOW",
+            "reason": "distinctive_title_mismatch",
+            "overlap_query": round(overlap_query, 3),
+            "overlap_candidate": round(overlap_candidate, 3),
+        }
+    return {
+        "confidence": "MEDIUM",
+        "reason": "fuzzy_title_match",
+        "sequence_ratio": round(sequence_ratio, 3),
+        "overlap_query": round(overlap_query, 3),
+        "overlap_candidate": round(overlap_candidate, 3),
+    }
 
 
 class KitsuProvider:
@@ -132,6 +265,7 @@ class KitsuProvider:
                 return CanonicalMetadata(
                     title=canonical,
                     year=disp_year,
+                    media_type="movie" if media_type == "movie" else "tv",
                     series_title=canonical
                     if media_type in ("single_episode", "episode_range", "season_pack")
                     else None,
@@ -146,6 +280,7 @@ class KitsuProvider:
                 best_match = CanonicalMetadata(
                     title=canonical,
                     year=disp_year,
+                    media_type="movie" if media_type == "movie" else "tv",
                     series_title=canonical
                     if media_type in ("single_episode", "episode_range", "season_pack")
                     else None,
@@ -175,7 +310,8 @@ class KitsuProvider:
         )
 
         ep_title = None
-        if ep_data and ep_data.get("data"):
+        episode_found = bool(ep_data and ep_data.get("data"))
+        if episode_found:
             ep_attrs = ep_data["data"][0].get("attributes", {})
             ep_titles = ep_attrs.get("titles", {})
             candidate = (
@@ -190,6 +326,7 @@ class KitsuProvider:
         return CanonicalMetadata(
             series_title=anime_meta.series_title,
             year=anime_meta.year,
+            media_type="tv",
             episode_title=ep_title,
             provider="kitsu",
             provider_id=anime_id,
@@ -235,6 +372,7 @@ class CinemetaProvider:
                 return CanonicalMetadata(
                     title=item_name,
                     year=item_year,
+                    media_type="movie" if stype == "movie" else "tv",
                     series_title=item_name
                     if media_type in ("single_episode", "episode_range", "season_pack")
                     else None,
@@ -290,6 +428,7 @@ class CinemetaProvider:
         return CanonicalMetadata(
             series_title=meta.series_title,
             year=meta.year,
+            media_type="tv",
             episode_title=ep_title,
             season=mapped_season,
             episode=mapped_ep,
@@ -410,6 +549,7 @@ class IMDbProvider:
             return CanonicalMetadata(
                 title=disp_title,
                 year=disp_year,
+                media_type="movie" if getattr(target, "kind", None) == "movie" else "tv",
                 series_title=disp_title
                 if media_type in ("single_episode", "episode_range", "season_pack")
                 else None,
@@ -485,6 +625,7 @@ class IMDbProvider:
                 return None
 
             ep_title = None
+            episode_found = False
             if s_obj and hasattr(s_obj, "episodes"):
                 with suppress(Exception):
                     episodes_data = getattr(s_obj, "episodes", None)
@@ -492,11 +633,15 @@ class IMDbProvider:
                         se_eps = episodes_data.get(season, {})
                         ep_obj = se_eps.get(episode)
                         if ep_obj:
+                            episode_found = True
                             ep_title = getattr(ep_obj, "title", None)
 
             return CanonicalMetadata(
                 series_title=series_disp,
+                media_type="tv",
                 episode_title=ep_title,
+                season=season if episode_found else None,
+                episode=episode if episode_found else None,
                 provider="imdb",
                 provider_id=f"tt{series_id}",
             )
@@ -614,6 +759,13 @@ class TMDbProvider:
         return CanonicalMetadata(
             title=disp_title,
             year=disp_year,
+            media_type=(
+                "movie"
+                if endpoint == "/search/movie"
+                else "tv"
+                if endpoint == "/search/tv"
+                else item.get("media_type")
+            ),
             series_title=disp_title
             if media_type in ("single_episode", "episode_range", "season_pack")
             else None,
@@ -621,6 +773,101 @@ class TMDbProvider:
             provider_id=str(item.get("id")),
             ott=networks,
         )
+
+    async def resolve_manual(
+        self,
+        kind: str,
+        tmdb_id: int,
+        season: Optional[int] = None,
+        episode: Optional[int] = None,
+    ) -> tuple[Optional[CanonicalMetadata], Optional[str]]:
+        """Resolve an exact user-supplied TMDB record without fuzzy search."""
+        if not str(Config.TMDB_ACCESS_TOKEN or "").strip():
+            return None, "TMDB_ACCESS_TOKEN is not configured."
+
+        if kind == "movie":
+            data = await self._request(f"/movie/{tmdb_id}")
+            if not data or not data.get("title"):
+                return None, "TMDB could not retrieve that movie. Check the ID or TMDB API credentials."
+            release_date = str(data.get("release_date") or "")
+            return (
+                CanonicalMetadata(
+                    title=data.get("title") or data.get("original_title"),
+                    year=release_date[:4] if len(release_date) >= 4 else None,
+                    media_type="movie",
+                    provider="tmdb",
+                    provider_id=str(tmdb_id),
+                    source="manual_tmdb",
+                    selection_type="movie",
+                ),
+                None,
+            )
+
+        if kind in ("single_episode", "season_pack"):
+            tv = await self._request(f"/tv/{tmdb_id}")
+            if not tv or not (tv.get("name") or tv.get("original_name")):
+                return None, "TMDB could not retrieve that TV series. Check the ID or TMDB API credentials."
+            first_air_date = str(tv.get("first_air_date") or "")
+            year = first_air_date[:4] if len(first_air_date) >= 4 else None
+            networks = [n.get("name") for n in tv.get("networks", []) if n.get("name")]
+            series_title = tv.get("name") or tv.get("original_name")
+
+            if kind == "single_episode":
+                ep = await self._request(
+                    f"/tv/{tmdb_id}/season/{season}/episode/{episode}"
+                )
+                if not ep or not ep.get("name"):
+                    return None, "TMDB could not retrieve that episode. Verify the season and episode numbers."
+                if int(ep.get("season_number", season)) != season or int(
+                    ep.get("episode_number", episode)
+                ) != episode:
+                    return None, "TMDB returned an episode with different season/episode coordinates."
+                return (
+                    CanonicalMetadata(
+                        series_title=series_title,
+                        year=year,
+                        media_type="tv",
+                        episode_title=ep.get("name"),
+                        provider="tmdb",
+                        provider_id=str(tmdb_id),
+                        ott=networks[0] if networks else None,
+                        season=season,
+                        episode=episode,
+                        source="manual_tmdb",
+                        selection_type="single_episode",
+                    ),
+                    None,
+                )
+
+            season_data = await self._request(f"/tv/{tmdb_id}/season/{season}")
+            if not season_data or "episodes" not in season_data:
+                return None, "TMDB could not retrieve that season. Verify the series and season numbers."
+            if int(season_data.get("season_number", season)) != season:
+                return None, "TMDB returned a different season number."
+            episode_titles = {}
+            for item in season_data.get("episodes", []):
+                try:
+                    number = int(item.get("episode_number"))
+                except (TypeError, ValueError):
+                    continue
+                episode_titles[number] = item.get("name") or ""
+            return (
+                CanonicalMetadata(
+                    series_title=series_title,
+                    year=year,
+                    media_type="tv",
+                    provider="tmdb",
+                    provider_id=str(tmdb_id),
+                    ott=networks[0] if networks else None,
+                    season=season,
+                    source="manual_tmdb",
+                    selection_type="season_pack",
+                    episode_titles=episode_titles,
+                ),
+                None,
+            )
+
+        return None, "Unsupported TMDB URL type."
 
     async def find_episode(
         self,
@@ -654,13 +901,25 @@ class TMDbProvider:
         series_disp = tv_item.get("name") or tv_item.get("original_name")
 
         ep_data = await self._request(f"/tv/{tv_id}/season/{season}/episode/{episode}")
-        ep_title = None
-        if ep_data and ep_data.get("name"):
-            ep_title = ep_data.get("name")
+        if not ep_data:
+            return None
+        ep_title = ep_data.get("name")
 
+        tv_details = await self._request(f"/tv/{tv_id}")
+        first_air_date = str((tv_details or {}).get("first_air_date") or "")
+        networks = [
+            n.get("name")
+            for n in (tv_details or {}).get("networks", [])
+            if n.get("name")
+        ]
         return CanonicalMetadata(
             series_title=series_disp,
+            year=first_air_date[:4] if len(first_air_date) >= 4 else None,
+            media_type="tv",
             episode_title=ep_title,
+            ott=networks[0] if networks else None,
+            season=season,
+            episode=episode,
             provider="tmdb",
             provider_id=str(tv_id),
         )
@@ -722,9 +981,24 @@ class CanonicalMetadataResolver:
 
         providers = self._get_provider_chain(media_type, is_anime)
         res = None
-        for provider in providers:
-            res = await provider.find_title(title, year, media_type)
-            if res and res.title:
+        first_match_index = None
+        for index, provider in enumerate(providers):
+            candidate = await provider.find_title(title, year, media_type)
+            if candidate and (candidate.title or candidate.series_title):
+                if res is None:
+                    res = candidate
+                    first_match_index = index
+                else:
+                    if _providers_disagree(res, candidate):
+                        res.provider_conflict = True
+                    elif not res.year and candidate.year:
+                        res.year = candidate.year
+                    if not res.ott and candidate.ott:
+                        res.ott = candidate.ott
+                    break
+            # Check one additional provider after the first match. This catches
+            # disagreement without turning every rename into a full provider sweep.
+            if res is not None and first_match_index is not None and index > first_match_index:
                 break
 
         if res:
@@ -754,12 +1028,14 @@ class CanonicalMetadataResolver:
 
         providers = self._get_provider_chain("single_episode", is_anime)
         res = None
-        for provider in providers:
+        for index, provider in enumerate(providers):
             cand = await provider.find_episode(series_title, season, episode, year)
             if cand and cand.series_title:
                 if not res:
                     res = cand
                 else:
+                    if _providers_disagree(res, cand):
+                        res.provider_conflict = True
                     if cand.episode_title and not res.episode_title:
                         res.episode_title = cand.episode_title
                     if (
@@ -770,12 +1046,16 @@ class CanonicalMetadataResolver:
                         res.season = cand.season
                         res.episode = cand.episode
 
-                if (
-                    res.episode_title
-                    and res.season is not None
-                    and res.episode is not None
-                ):
-                    break
+            # Once a complete candidate exists, inspect one additional provider
+            # for disagreement, then stop to keep lookup latency bounded.
+            if (
+                index >= 1
+                and res
+                and res.episode_title
+                and res.season is not None
+                and res.episode is not None
+            ):
+                break
 
         if res:
             if len(self.cache) > 200:
