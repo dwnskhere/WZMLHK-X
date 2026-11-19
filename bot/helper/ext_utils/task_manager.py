@@ -22,6 +22,8 @@ from .status_utils import get_readable_time, get_readable_file_size, get_specifi
 
 
 async def stop_duplicate_check(listener):
+    if getattr(listener, "skip_stop_duplicate", False):
+        return False, None
     if (
         isinstance(listener.up_dest, int)
         or listener.is_leech

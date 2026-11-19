@@ -1,3 +1,4 @@
+import random
 import re
 from asyncio import gather, sleep
 from contextlib import suppress
@@ -129,6 +130,8 @@ class TaskConfig:
         self.join = False
         self.private_link = False
         self.stop_duplicate = False
+        self.skip_stop_duplicate = False
+        self.skip_smart_autorename = False
         self.sample_video = False
         self.convert_audio = False
         self.convert_video = False
@@ -184,6 +187,8 @@ class TaskConfig:
             if "SMART_AUTORENAME" in self.user_dict
             else Config.SMART_AUTORENAME
         )
+        if getattr(self, "skip_smart_autorename", False):
+            self.smart_autorename = False
 
     def _set_mode_engine(self):
         self.source_url = (
@@ -255,6 +260,12 @@ class TaskConfig:
             dump_dest = getattr(self, "dump_dest", "") or getattr(self, "up_dest", "")
             if dump_dest and dump_dest in stremio_chats:
                 return stremio_chats[dump_dest]
+            if Config.STREMIO_RANDOM_DUMP or dump_dest == "random":
+                chosen_name, chosen_chat = random.choice(list(stremio_chats.items()))
+                LOGGER.info(
+                    f"Stremio: Randomly selected dump channel '{chosen_name}' ({chosen_chat})"
+                )
+                return chosen_chat
             picked, is_cancelled = await open_dump_chat_btns(
                 self.message, stremio_chats, dump_dest
             )
@@ -353,6 +364,8 @@ class TaskConfig:
                 or "STOP_DUPLICATE" not in self.user_dict
                 and Config.STOP_DUPLICATE
             )
+            if self.skip_stop_duplicate:
+                self.stop_duplicate = False
             default_upload = (
                 self.user_dict.get("DEFAULT_UPLOAD", "") or Config.DEFAULT_UPLOAD
             )

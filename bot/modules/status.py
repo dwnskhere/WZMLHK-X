@@ -1,5 +1,6 @@
 from psutil import cpu_percent, virtual_memory, disk_usage
 from time import time
+from random import choice
 from asyncio import gather, iscoroutinefunction
 
 from pyrogram.errors import QueryIdInvalid
@@ -35,6 +36,24 @@ from ..helper.telegram_helper.message_utils import (
 from ..helper.telegram_helper.button_build import ButtonMaker
 
 
+EMPTY_STATUS_ROASTS = [
+    "<i>Empty. Just like your head.</i>",
+    "<i>Nothing here. Much like your social life.</i>",
+    "<i>*Cricket noises*... Not a single task in sight.</i>",
+    "<i>I'm chilling right now, why aren't you?</i>",
+    "<i>Drier than a desert out here. Give me some work!</i>",
+    "<i>No tasks running. Bot is on vacation, please don't disturb.</i>",
+    "<i>Ghost town in here. Feed me a link or magnet!</i>",
+    "<i>Zero tasks active. Even my CPU is falling asleep.</i>",
+    "<i>Cool as ice. Nothing is downloading or leeching.</i>",
+    "<i>Are you expecting magic? Add a task first!</i>",
+    "<i>404: Tasks abducted by aliens.</i>",
+    "<i>Couch potato mode: ACTIVE.</i>",
+    "<i>Nothing to see here. Move along.</i>",
+    "<i>Did you really type /status just to see this?</i>",
+]
+
+
 @new_task
 async def task_status(_, message):
     async with task_dict_lock:
@@ -42,7 +61,8 @@ async def task_status(_, message):
     if count == 0:
         currentTime = get_readable_time(time() - bot_start_time)
         free = get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)
-        msg = f"""〶 <b><i>No Active Bot Tasks!</i></b>
+        quote = choice(EMPTY_STATUS_ROASTS)
+        msg = f"""〶 <b>{quote}</b>
 
 ⌬ <b><u>Bot Stats</u></b>
 ┟ <b>CPU</b> → {cpu_percent()}% | <b>F</b> → {free} [{round(100 - disk_usage(DOWNLOAD_DIR).percent, 1)}%]

@@ -292,8 +292,10 @@ class DbManager:
                     for coll in collections:
                         if coll in ("admin", "local", "config"):
                             continue
-                        cursor = db[coll].find().limit(limit)
-                        async for doc in cursor:
+                        find_cursor = db[coll].find()
+                        if limit:
+                            find_cursor = find_cursor.limit(limit)
+                        async for doc in find_cursor:
                             doc["collection"] = coll
                             all_items.append(doc)
                 await client.close()
@@ -302,7 +304,7 @@ class DbManager:
                     f"Failed to fetch Stremio items from MongoDB ({url[:20]}...): {e}"
                 )
 
-        return all_items[:limit]
+        return all_items[:limit] if limit else all_items
 
 
 database = DbManager()

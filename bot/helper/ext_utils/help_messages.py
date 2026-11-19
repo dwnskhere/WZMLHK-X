@@ -199,6 +199,13 @@ force_start = """<b>Force Start</b>: -f -fd -fu
 /cmd link -fd (force download only)
 /cmd link -fu (force upload directly after download finish)"""
 
+skip_duplicate = """<b>Skip Stop Duplicate</b>: -ssd or -dup
+/cmd link -ssd (bypass stop duplicate check for this task)
+/cmd link -dup (alias for -ssd)"""
+
+skip_smart_autorename = """<b>Skip Smart Auto Rename</b>: -ssar
+/cmd link -ssar (bypass smart auto renaming for this task and keep original file names)"""
+
 gdrive = """<b>Gdrive</b>: link
 If DEFAULT_UPLOAD is `rc` then you can pass up: `gd` to upload using gdrive tools to GDRIVE_ID.
 /cmd gdriveLink or gdl or gdriveId -up gdl or gdriveId or gd
@@ -308,6 +315,8 @@ YT_HELP_DICT = {
     "Screenshot": screenshot,
     "Convert-Media": convert_media,
     "Force-Start": force_start,
+    "Skip-Duplicate": skip_duplicate,
+    "Skip-SmartAutoRename": skip_smart_autorename,
     "Name-Swap": name_swap,
     "TG-Transmission": transmission,
     "Thumb-Layout": thumbnail_layout,
@@ -338,6 +347,7 @@ MIRROR_HELP_DICT = {
     "Screenshot": screenshot,
     "Convert-Media": convert_media,
     "Force-Start": force_start,
+    "Skip-Duplicate": skip_duplicate,
     "User-Download": user_download,
     "Name-Swap": name_swap,
     "TG-Transmission": transmission,
@@ -352,6 +362,7 @@ CLONE_HELP_DICT = {
     "main": clone,
     "Multi-Link": multi_link,
     "Bulk": bulk,
+    "Skip-Duplicate": skip_duplicate,
     "Gdrive": gdrive,
     "Rclone": rclone_cl,
 }
@@ -400,6 +411,7 @@ def get_bot_commands():
         "Leech": "[link/file] Leech files to Upload to Telegram",
         "Sleech": "[link/file] Leech media directly to Stremio Dump channel",
         "StremioList": "View and get Stremio Media Library catalog",
+        "StremioDuplicate": "Audit Stremio database for duplicate media files of same quality",
         "QbLeech": "[magnet/torrent] Leech files to Upload to Telegram using qbit",
         "YtdlLeech": "[link] Leech YouTube, m3u8, Social Media and yt-dlp supported urls",
         "Clone": "[link] Clone files/folders to GDrive",
@@ -412,7 +424,7 @@ def get_bot_commands():
         "Latest": "Get latest files/folders from Rclone Remotes",
         "RclStorage": "Get rclone storage info",
         "RclDelete": "[query] Delete files/folders from rclone",
-        "Search": "[query] Search torrents via Qbit Plugins",
+        "Search": "[query] Search torrents via Jackett / Qbit Plugins with auto-leech/sleech",
         "MediaInfo": "[reply/link] Get MediaInfo of the Target Media",
         "Select": "[gid/reply] Select files for NZB, Aria2, Qbit Tasks",
         "Ping": "Ping Bot to test Response Speed",
@@ -536,9 +548,15 @@ def get_help_string():
         elif key == "RclDelete":
             help_lines.append(f"{cmd_str} [query]: Delete files/folders from rclone.")
         elif key == "Search":
-            help_lines.append(f"{cmd_str} [query]: Search for torrents with API.")
+            help_lines.append(
+                f"{cmd_str} [query]: Search torrents via Jackett / Plugins with auto-leech/sleech."
+            )
         elif key == "MediaInfo":
             help_lines.append(f"{cmd_str} [query]: Get media info.")
+        elif key == "JSearch":
+            help_lines.append(
+                f"{cmd_str} [query]: Search torrents via Jackett / Plugins with auto-leech/sleech."
+            )
         elif key == "Status":
             help_lines.append(f"{cmd_str}: Shows a status of all the downloads.")
         elif key == "Stats":

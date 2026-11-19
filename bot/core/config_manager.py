@@ -56,6 +56,10 @@ class Config:
     INCOMPLETE_TASK_RESUME = False
     INDEX_URL = ""
     IS_TEAM_DRIVE = False
+    JACKETT_URL = ""
+    JACKETT_API_KEY = ""
+    JACKETT_SEARCH_LIMIT = 10
+    JACKETT_SERIES_COOLDOWN = 180
     JD_EMAIL = ""
     JD_PASS = ""
     SEEDR_EMAIL = ""
@@ -121,6 +125,7 @@ class Config:
     STOP_DUPLICATE = False
     STOP_DUPLICATE_MIN_SIZE = 0
     STREMIO_DUMP_CHAT = ""
+    STREMIO_RANDOM_DUMP = False
     STREMIO_DB_URL = ""
     STREMIO_USERS = ""
     STREMIO_AUTHORIZED_CHATS = ""

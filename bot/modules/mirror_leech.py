@@ -143,6 +143,9 @@ class Mirror(TaskListener):
             "-z": False,
             "-sv": False,
             "-ss": False,
+            "-ssd": False,
+            "-dup": False,
+            "-ssar": False,
             "-f": False,
             "-fd": False,
             "-fu": False,
@@ -211,6 +214,10 @@ class Mirror(TaskListener):
         self.split_size = args["-sp"]
         self.sample_video = args["-sv"]
         self.screen_shots = args["-ss"]
+        self.skip_stop_duplicate = args["-ssd"] or args["-dup"]
+        self.skip_smart_autorename = args["-ssar"]
+        if self.skip_smart_autorename:
+            self.smart_autorename = False
         self.force_run = args["-f"]
         self.force_download = args["-fd"]
         self.force_upload = args["-fu"]
@@ -648,7 +655,9 @@ async def stremio_list(client, message):
 
         if created_paths:
             # Edit pages to link Next / Prev
-            await telegraph.edit_telegraph(created_paths, pages_content)
+            await telegraph.edit_telegraph(
+                created_paths, pages_content, title="Stremio Catalog"
+            )
             main_url = f"https://telegra.ph/{created_paths[0]}"
             buttons = ButtonMaker()
             buttons.url_button("📖 Open Stremio Library", main_url)
@@ -662,7 +671,322 @@ async def stremio_list(client, message):
     except Exception as e:
         LOGGER.error(f"Failed to create Stremio Telegraph page: {e}", exc_info=True)
         await edit_message(reply_msg, f"❌ <b>Error:</b> {e}")
-        await edit_message(reply_msg, f"Failed to generate Telegraph page: {e}")
+
+
+def _normalize_title_key(title_str):
+    if not title_str:
+        return ""
+    import re
+
+    # Remove extension, release tags, and symbols
+    clean = re.sub(
+        r"\.(mkv|mp4|avi|mov|flv|wmv|ts)$", "", title_str, flags=re.IGNORECASE
+    )
+    clean = re.sub(r"[\.\-_\+\[\]\(\)\{\}\:,]", " ", clean)
+    clean = re.sub(r"\s+", " ", clean).strip().lower()
+    return clean
+
+
+def _extract_resolution_and_episode(name):
+    if not name:
+        return "Unknown", None, None
+    import re
+
+    # Try guessit first if possible
+    res = None
+    season = None
+    episode = None
+    try:
+        from guessit import guessit
+
+        info = guessit(name)
+        if info.get("screen_size"):
+            res = str(info["screen_size"]).lower()
+        if info.get("season"):
+            season = info["season"]
+        if info.get("episode"):
+            episode = info["episode"]
+    except Exception:
+        pass
+
+    # Regex fallbacks
+    if not res:
+        res_match = re.search(
+            r"\b(2160p|4k|1080p|720p|480p|576p|360p)\b", name, re.IGNORECASE
+        )
+        if res_match:
+            res = res_match.group(1).lower()
+            if res == "4k":
+                res = "2160p"
+        else:
+            res = "Unknown"
+
+    if season is None or episode is None:
+        se_match = re.search(r"\b[sS](\d{1,2})[eE](\d{1,3})\b", name)
+        if se_match:
+            season = int(se_match.group(1))
+            episode = int(se_match.group(2))
+        else:
+            ep_match = re.search(r"\b[eE](\d{1,3})\b", name)
+            if ep_match:
+                episode = int(ep_match.group(1))
+
+    return res, season, episode
+
+
+async def stremio_duplicate(client, message):
+    reply_msg = await send_message(
+        message, "⏳ <i>Scanning Stremio database for media duplicates...</i>"
+    )
+    # Fetch all items without a small limit
+    items = await database.get_stremio_items(limit=0)
+    if not items:
+        await edit_message(
+            reply_msg, "<i>No Stremio media items found in database!</i>"
+        )
+        return
+
+    from collections import defaultdict
+
+    # Duplicate grouping:
+    # Key: (media_type, id_key, season, episode, resolution)
+    groups = defaultdict(list)
+    total_streams_scanned = 0
+
+    for item in items:
+        coll = item.get("collection", "media")
+        title = (
+            item.get("title")
+            or item.get("title_english")
+            or item.get("name")
+            or "Unknown Title"
+        )
+        year = str(item.get("release_year") or item.get("year") or "").strip()
+        imdb_id = item.get("imdb_id") or ""
+
+        # Identity key for the parent movie/show
+        if imdb_id:
+            id_key = f"imdb:{imdb_id}"
+        else:
+            norm_title = _normalize_title_key(title)
+            id_key = f"title:{norm_title}"
+
+        if year:
+            id_key += f":{year}"
+
+        # 1. Check TV Series schema: item["seasons"] -> season["episodes"] -> episode["telegram"]
+        seasons = item.get("seasons")
+        if isinstance(seasons, list) and seasons:
+            for s_entry in seasons:
+                if not isinstance(s_entry, dict):
+                    continue
+                s_num = s_entry.get("season_number")
+                episodes = s_entry.get("episodes")
+                if not isinstance(episodes, list):
+                    continue
+                for ep in episodes:
+                    if not isinstance(ep, dict):
+                        continue
+                    ep_num = ep.get("episode_number")
+                    ep_title = ep.get("title") or f"Episode {ep_num}"
+                    streams = ep.get("telegram") or []
+                    if isinstance(streams, list):
+                        for stream in streams:
+                            if not isinstance(stream, dict):
+                                continue
+                            total_streams_scanned += 1
+                            f_name = (
+                                stream.get("name")
+                                or stream.get("file_name")
+                                or f"{title} S{s_num}E{ep_num}"
+                            )
+                            # Resolution from stream field (e.g. "1080p") or parse from filename
+                            raw_quality = (
+                                str(stream.get("quality") or "").strip().lower()
+                            )
+                            parsed_res, _, _ = _extract_resolution_and_episode(
+                                f"{raw_quality} {f_name}"
+                            )
+                            res = (
+                                raw_quality
+                                if raw_quality and raw_quality != "unknown"
+                                else parsed_res
+                            )
+
+                            size_val = (
+                                stream.get("size") or stream.get("file_size") or ""
+                            )
+
+                            group_key = (coll, id_key, s_num, ep_num, res)
+                            groups[group_key].append(
+                                {
+                                    "title": title,
+                                    "ep_title": ep_title,
+                                    "file_name": f_name,
+                                    "year": year,
+                                    "resolution": res,
+                                    "season": s_num,
+                                    "episode": ep_num,
+                                    "collection": coll,
+                                    "size": size_val,
+                                }
+                            )
+            continue
+
+        # 2. Check Movie / Direct Stream schema: item["telegram"] (list of streams)
+        direct_streams = item.get("telegram")
+        if isinstance(direct_streams, list) and direct_streams:
+            for stream in direct_streams:
+                if not isinstance(stream, dict):
+                    continue
+                total_streams_scanned += 1
+                f_name = stream.get("name") or stream.get("file_name") or title
+                raw_quality = str(stream.get("quality") or "").strip().lower()
+                parsed_res, s_num, ep_num = _extract_resolution_and_episode(
+                    f"{raw_quality} {f_name}"
+                )
+                res = (
+                    raw_quality
+                    if raw_quality and raw_quality != "unknown"
+                    else parsed_res
+                )
+
+                size_val = stream.get("size") or stream.get("file_size") or ""
+
+                group_key = (coll, id_key, s_num, ep_num, res)
+                groups[group_key].append(
+                    {
+                        "title": title,
+                        "file_name": f_name,
+                        "year": year,
+                        "resolution": res,
+                        "season": s_num,
+                        "episode": ep_num,
+                        "collection": coll,
+                        "size": size_val,
+                    }
+                )
+            continue
+
+        # 3. Fallback for flat items (or other collections)
+        total_streams_scanned += 1
+        file_name = (
+            item.get("file_name")
+            or item.get("filename")
+            or item.get("name")
+            or title
+            or "Unknown File"
+        )
+        res, season, episode = _extract_resolution_and_episode(f"{title} {file_name}")
+        group_key = (coll, id_key, season, episode, res)
+        groups[group_key].append(
+            {
+                "title": title or file_name,
+                "file_name": file_name,
+                "year": year,
+                "resolution": res,
+                "season": season,
+                "episode": episode,
+                "collection": coll,
+                "size": item.get("file_size") or item.get("size") or 0,
+            }
+        )
+
+    # Filter only groups with 2 or more files (Duplicates)
+    dup_groups = [g for g in groups.values() if len(g) > 1]
+
+    if not dup_groups:
+        await edit_message(
+            reply_msg,
+            f"✅ <b>Clean! No duplicate media found in Stremio database.</b>\n\n"
+            f"Total Titles: <b>{len(items)}</b>\n"
+            f"Total Streams Scanned: <b>{total_streams_scanned}</b>",
+        )
+        return
+
+    total_dup_groups = len(dup_groups)
+    total_redundant_files = sum(len(g) - 1 for g in dup_groups)
+
+    # Build Telegraph pages (80 duplicate groups per page)
+    PAGE_SIZE = 40
+    pages = [
+        dup_groups[i : i + PAGE_SIZE] for i in range(0, len(dup_groups), PAGE_SIZE)
+    ]
+    total_pages = len(pages)
+    pages_content = []
+
+    for idx, page_groups in enumerate(pages, start=1):
+        content = (
+            f"<h3>🔍 <b><u>Stremio Database Duplicates</u></b> (Page {idx}/{total_pages})</h3>"
+            f"<p><b>Total Media Scanned:</b> {len(items)}<br>"
+            f"<b>Duplicate Groups:</b> {total_dup_groups}<br>"
+            f"<b>Redundant Extra Copies:</b> {total_redundant_files}</p><hr>"
+        )
+        content += "<ol>"
+        for g in page_groups:
+            first = g[0]
+            m_title = escape(first["title"])
+            year_str = f" ({first['year']})" if first["year"] else ""
+            res_str = (
+                f" [{first['resolution'].upper()}]"
+                if first["resolution"] != "Unknown"
+                else ""
+            )
+            ep_str = ""
+            if first.get("season") is not None and first.get("episode") is not None:
+                ep_name = f" - {first.get('ep_title')}" if first.get("ep_title") else ""
+                ep_str = f" — S{first['season']:02d}E{first['episode']:02d}{ep_name}"
+            elif first.get("episode") is not None:
+                ep_str = f" — EP {first['episode']}"
+
+            content += f"<li><b>{m_title}{year_str}{ep_str}{res_str}</b> — <i>{len(g)} copies</i>"
+            for item in g:
+                fname = escape(item["file_name"])
+                raw_size = item["size"]
+                if isinstance(raw_size, (int, float)) and raw_size > 0:
+                    size_str = f" ({get_readable_file_size(raw_size)})"
+                elif isinstance(raw_size, str) and raw_size:
+                    size_str = f" ({raw_size})"
+                else:
+                    size_str = ""
+                content += f"<br>↳ <code>{fname}</code>{size_str}"
+            content += "<br><br></li>"
+        content += "</ol>"
+        pages_content.append(content)
+
+    try:
+        created_paths = []
+        for idx, p_content in enumerate(pages_content, start=1):
+            t_page = await telegraph.create_page(
+                title=f"Stremio Duplicates - Page {idx}", content=p_content
+            )
+            t_path = t_page.get("path", "") if isinstance(t_page, dict) else ""
+            if t_path:
+                created_paths.append(t_path)
+
+        if created_paths:
+            await telegraph.edit_telegraph(
+                created_paths, pages_content, title="Stremio Duplicates"
+            )
+            main_url = f"https://telegra.ph/{created_paths[0]}"
+            buttons = ButtonMaker()
+            buttons.url_button("📑 View Duplicates on Telegraph", main_url)
+            await edit_message(
+                reply_msg,
+                f"⌬ <b><u>Stremio Duplicates Audit</u></b>\n\n"
+                f"📊 <b>Total Media Scanned:</b> {len(items)}\n"
+                f"⚠️ <b>Duplicate Groups:</b> {total_dup_groups}\n"
+                f"🗑️ <b>Redundant Copies:</b> {total_redundant_files}\n"
+                f"📄 <b>Telegraph Pages:</b> {len(created_paths)}",
+                buttons.build_menu(1),
+            )
+        else:
+            await edit_message(reply_msg, "<i>Failed to generate Telegraph page!</i>")
+    except Exception as e:
+        LOGGER.error(
+            f"Failed to create Stremio Duplicates Telegraph page: {e}", exc_info=True
+        )
+        await edit_message(reply_msg, f"❌ <b>Error:</b> {e}")
 
 
 async def qb_leech(client, message):

@@ -55,10 +55,13 @@ class TelegraphHelper:
             await sleep(st.retry_after)
             return await self.edit_page(path, title, content)
 
-    async def edit_telegraph(self, path, telegraph_content):
+    async def edit_telegraph(self, path, telegraph_content, title=None):
+        title = title or Config.AUTHOR_NAME or "WZML-X"
+        num_of_path = len(path)
+        if num_of_path <= 1:
+            return
         nxt_page = 1
         prev_page = 0
-        num_of_path = len(path)
         for content in telegraph_content:
             if nxt_page == 1:
                 content += (
@@ -72,9 +75,10 @@ class TelegraphHelper:
                 if nxt_page < num_of_path:
                     content += f'<b> | <a href="https://telegra.ph/{path[nxt_page]}">Next</a></b>'
                     nxt_page += 1
+            page_title = f"{title} - Page {prev_page + 1}" if num_of_path > 1 else title
             await self.edit_page(
                 path=path[prev_page],
-                title="WZML-X Torrent Search",
+                title=page_title,
                 content=content,
             )
         return

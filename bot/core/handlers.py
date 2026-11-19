@@ -258,6 +258,13 @@ def add_handlers():
     )
     TgClient.bot.add_handler(
         MessageHandler(
+            stremio_duplicate,
+            filters=command(BotCommands.StremioDuplicateCommand, case_sensitive=True)
+            & CustomFilters.stremio,
+        )
+    )
+    TgClient.bot.add_handler(
+        MessageHandler(
             qb_leech,
             filters=command(BotCommands.QbLeechCommand, case_sensitive=True)
             & CustomFilters.authorized,

@@ -342,16 +342,39 @@ def is_valid_query(query):
 @lru_cache(maxsize=500)
 def get_folder_size(path):
     """
-    Returns (bytes, file_count) for a folder using `rclone size`.
-    Cached via LRU to avoid recomputing slow recursive scans.
+    Returns (bytes, file_count) for a folder.
+    First calculates from global_file_index in memory (instant, 0 network calls).
+    Falls back to `rclone size` only if index is empty.
     """
+    norm_path = path.strip("/").lower()
+
+    # 1. Fast, instant in-memory calculation from cached index
+    if global_file_index:
+        total_bytes = 0
+        file_count = 0
+        found = False
+        prefix = f"{norm_path}/"
+        for item in global_file_index:
+            item_path = item.get("Path", "").strip("/").lower()
+            if item_path.startswith(prefix) and not item.get("IsDir", False):
+                found = True
+                total_bytes += item.get("Size", 0)
+                file_count += 1
+        if found:
+            return total_bytes, file_count
+
+    # 2. Fallback to `rclone size`
     try:
+        remote = RCLONE_REMOTE.rstrip(":") + ":"
+        parts = [p.strip("/") for p in [REMOTE_BASE_PATH, path] if p and p.strip("/")]
+        remote_target = f"{remote}{'/'.join(parts)}"
+
         cmd = [
             BinConfig.RCLONE_NAME,
             "--config",
             "rclone.conf",
             "size",
-            f"{RCLONE_REMOTE}{REMOTE_BASE_PATH}/{path}",
+            remote_target,
             "--json",
         ]
 
@@ -360,6 +383,7 @@ def get_folder_size(path):
             data = json.loads(result)
             return data.get("bytes", 0), data.get("count", 0)
 
+        return 0, 0
     except Exception as e:
         LOGGER.error(f"Error parsing folder size for {path}: {e}")
         return 0, 0

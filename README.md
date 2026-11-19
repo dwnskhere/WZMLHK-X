@@ -126,6 +126,11 @@ Deploy with Docker and provide the required configuration values. The container 
    git clone https://github.com/SilentDemonSD/WZML-X.git
    cd WZML-X
    docker build -t wzmlx .
+
+   # Option A: With Host Network (Recommended - allows direct 127.0.0.1 Jackett access)
+   docker run --net=host -v ./jackett_config:/config/jackett:ro wzmlx
+
+   # Option B: Standard Port Mapping
    docker run -p 80:80 -p 8080:8080 wzmlx
    ```
 
@@ -197,11 +202,12 @@ Then tune the optional behavior from `config_sample.py`.
 </details>
 
 <details>
-   <summary>Stremio Integration (<code>/sleech</code> & <code>/stremiolist</code>)</summary>
+   <summary>Stremio Integration (<code>/sleech</code>, <code>/stremiolist</code> & <code>/stremiodup</code>)</summary>
 
    Integrate directly with [Telegram-Stremio](https://github.com/weebzone/Telegram-Stremio) for streaming leeched media.
 
    - `STREMIO_DUMP_CHAT`: Single chat ID or dictionary of named channels (`{"Movies": -100111, "Anime": -100222}`).
+   - `STREMIO_RANDOM_DUMP`: Automatically select a random Stremio dump channel from `STREMIO_DUMP_CHAT` on each task (default: `False`). Set to `True` for automated load balancing without channel selection prompts.
    - `STREMIO_DB_URL`: Read-only connection URL for your Telegram-Stremio MongoDB database (`dbFyvio`).
    - `STREMIO_USERS`: Space-separated User IDs allowed to use Stremio commands.
    - `STREMIO_AUTHORIZED_CHATS`: Space-separated Group/Channel Chat IDs allowed for Stremio commands.
@@ -209,6 +215,40 @@ Then tune the optional behavior from `config_sample.py`.
    **Commands & Capabilities:**
    - `/sleech <link>` (or `/stremio` / `/slch`): Automatically extracts archives (`.zip`, `.rar`, `.7z`), strips non-media files using a strict video/subtitle allowlist, cleans up empty subdirectories, and aborts tasks if 0 video files remain. Sends non-split videos as media preview, and splits large videos (> 2GB) losslessly into binary chunks (`.001`, `.002`). Prompts with interactive channel buttons when multiple Stremio dump chats exist (or pass `-ud <name>` to skip).
    - `/stremiolist` (or `/slist`): Queries `STREMIO_DB_URL` and generates an organized multi-page Telegraph media catalog with automatic `[Next ➡]` and `[⬅ Prev]` pagination links.
+   - `/stremiodup` (or `/sdup` / `/sduplicate`): Audits the Stremio MongoDB database for duplicate media files of identical quality (e.g. two 1080p copies of the same movie or episode). Groups duplicates and generates a private Telegraph report with pagination so the Telegram-Stremio host/admin can easily review and clean them up.
+</details>
+
+<details>
+   <summary>Torrent Search & Automation (<code>/search</code>)</summary>
+
+   Unified search across all indexers via [Jackett](https://github.com/Jackett/Jackett) (or qBittorrent plugins as fallback), with in-chat interactive buttons to trigger qbMirror, qbLeech, or Stremio Sleech with safe batch queueing.
+
+   - `JACKETT_URL`: URL to your external Jackett instance (e.g. `http://your-server-ip:9117` or Cloudflare Tunnel URL). If left empty, `/search` automatically uses qBittorrent search plugins.
+   - `JACKETT_API_KEY`: API Key from your Jackett dashboard.
+   - `JACKETT_SEARCH_LIMIT`: Maximum number of search results to retrieve (default: `10`).
+   - `JACKETT_SERIES_COOLDOWN`: Cooldown rest period in seconds between sequential season downloads (default: `180`).
+
+   **Commands & Capabilities:**
+   - `/search <query>` (or `/s`): Searches via Jackett (or fallback plugins), displaying an interactive menu with release title, size, seeders, and engine badge (`[Engine: Jackett]` or `[Engine: qBit Plugins]`).
+   - **One-Click Routing**:
+     - `[📥 qbMirror]`: Sends release to qBittorrent for cloud/drive upload.
+     - `[📤 qbLeech]`: Leech torrent via qBittorrent directly to user chat.
+     - `[📺 Sleech (Stremio)]`: Directly feeds into your Stremio Dump Channel.
+   - **Safe Series Queueing (Anti-Abuse)**:
+     - Automatically parses TV series into individual season packs.
+     - Includes `[Filter by Season]` and `[All Seasons (Safe Queue)]`.
+     - When downloading entire series, it avoids dumping 100+ GB at once: it processes Season 1, finishes uploading to Telegram, waits the configured cooldown delay (e.g. 3 min) to protect against Telegram `FLOOD_WAIT` bans, and then starts Season 2.
+
+   **Deployment Options:**
+   - **Docker Compose (Zero-Config)**: Jackett is bundled in `docker-compose.yml`. Just run `docker compose up -d`. The bot auto-detects `http://jackett:9117` and auto-reads the API key from `./jackett_config`.
+   - **Standalone Docker Run**:
+     ```bash
+     # 1. Run Jackett container
+     docker run -d --name jackett -p 9117:9117 -v ~/.config/jackett:/config lscr.io/linuxserver/jackett:latest
+
+     # 2. Run MirrorBot (uses host networking to auto-connect to 127.0.0.1:9117)
+     docker run --net=host -v ~/.config/jackett:/config/jackett:ro wzmlx
+     ```
 </details>
 
 ## Project Layout
