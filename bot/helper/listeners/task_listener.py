@@ -27,6 +27,14 @@ from ..common import TaskConfig
 from ...core.tg_client import TgClient
 from ...core.config_manager import Config
 from ...core.torrent_manager import TorrentManager
+
+try:  # optional read-only monitoring observer; falls back to a no-op
+    from ...monitoring.hooks import record_lifecycle_event
+except Exception:
+
+    def record_lifecycle_event(*_args, **_kwargs):
+        return None
+
 from ..ext_utils.bot_utils import sync_to_async
 from ..ext_utils.links_utils import encode_slink
 from ..ext_utils.db_handler import database
@@ -102,6 +110,7 @@ class TaskListener(TaskConfig):
 
     async def on_download_start(self):
         self.download_start_time = time()
+        record_lifecycle_event(self, "task.started", stage="downloading")
         mode_name = "Leech" if self.is_leech else "Mirror"
         if self.bot_pm and self.is_super_chat:
             self.pm_msg = await send_message(
@@ -134,6 +143,7 @@ class TaskListener(TaskConfig):
         await sleep(2)
         if self.is_cancelled:
             return
+        record_lifecycle_event(self, "task.stage_completed", stage="downloading")
         multi_links = False
         if (
             self.folder_name
@@ -491,6 +501,13 @@ class TaskListener(TaskConfig):
     async def on_upload_complete(
         self, link, files, folders, mime_type, rclone_path="", dir_id=""
     ):
+        record_lifecycle_event(self, "task.stage_completed", stage="uploading")
+        record_lifecycle_event(
+            self,
+            "task.seeding_started" if getattr(self, "seed", False) else "task.succeeded",
+            stage="seeding" if getattr(self, "seed", False) else "uploading",
+            outcome="upload_succeeded" if getattr(self, "seed", False) else "succeeded",
+        )
         upload_time = time() - getattr(self, "upload_start_time", time())
         self.avg_upload_speed = self.size / upload_time if upload_time > 0 else 0
         if (
@@ -710,6 +727,7 @@ class TaskListener(TaskConfig):
         await start_from_queued()
 
     async def on_download_error(self, error, button=None, is_limit=False):
+        record_lifecycle_event(self, "task.error", stage="downloading", error=error, is_limit=is_limit)
         async with task_dict_lock:
             if self.mid in task_dict:
                 del task_dict[self.mid]
@@ -787,6 +805,7 @@ class TaskListener(TaskConfig):
             await remove(self.thumb)
 
     async def on_upload_error(self, error):
+        record_lifecycle_event(self, "task.error", stage="uploading", error=error)
         async with task_dict_lock:
             if self.mid in task_dict:
                 del task_dict[self.mid]

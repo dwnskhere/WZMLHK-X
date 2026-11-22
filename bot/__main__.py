@@ -91,6 +91,13 @@ from .modules import restart_notification
 
 bot_loop.create_task(restart_notification())
 
+try:  # optional read-only monitoring; never blocks or breaks startup
+    from .monitoring import start_monitoring
+
+    bot_loop.create_task(start_monitoring())
+except Exception as _monitor_exc:
+    LOGGER.warning(f"Monitoring not started: {_monitor_exc}")
+
 if not Config.DISABLE_PLUGINS:
     from .core.plugin_manager import get_plugin_manager
     from .modules.plugin_manager import register_plugin_commands
