@@ -501,6 +501,8 @@ class TaskListener(TaskConfig):
     async def on_upload_complete(
         self, link, files, folders, mime_type, rclone_path="", dir_id=""
     ):
+        upload_time = time() - getattr(self, "upload_start_time", time())
+        self.avg_upload_speed = self.size / upload_time if upload_time > 0 else 0
         record_lifecycle_event(self, "task.stage_completed", stage="uploading")
         record_lifecycle_event(
             self,
@@ -508,8 +510,6 @@ class TaskListener(TaskConfig):
             stage="seeding" if getattr(self, "seed", False) else "uploading",
             outcome="upload_succeeded" if getattr(self, "seed", False) else "succeeded",
         )
-        upload_time = time() - getattr(self, "upload_start_time", time())
-        self.avg_upload_speed = self.size / upload_time if upload_time > 0 else 0
         if (
             self.is_super_chat
             and (Config.INCOMPLETE_TASK_NOTIFIER or Config.INCOMPLETE_TASK_RESUME)
