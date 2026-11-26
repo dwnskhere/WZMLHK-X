@@ -166,6 +166,12 @@ async def confirm_restart(_, query):
         if st := intervals["status"]:
             for intvl in list(st.values()):
                 intvl.cancel()
+        try:  # release monitoring resources first; never blocks the restart
+            from ..monitoring import stop_monitoring
+
+            await stop_monitoring()
+        except Exception:
+            pass
         await mega_cleanup()
         await clean_all()
         await TorrentManager.close_all()

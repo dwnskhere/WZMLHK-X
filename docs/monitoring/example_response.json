@@ -1,0 +1,2871 @@
+{
+  "success": true,
+  "api_version": "1",
+  "schema_version": "1.0.0",
+  "data": {
+    "instance": {
+      "instance_id": "default",
+      "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+      "wzml_version": null,
+      "wzml_commit": null,
+      "started_at": "2026-11-22T14:03:50.672Z",
+      "uptime_seconds": 99
+    },
+    "bot": {
+      "state": "starting",
+      "telegram_bot": {
+        "configured": true,
+        "connected": true
+      },
+      "telegram_user": {
+        "configured": false,
+        "connected": null
+      },
+      "web_process": "unknown",
+      "monitoring": {
+        "collector_state": "starting",
+        "cycles": 0,
+        "skipped_cycles": 0,
+        "failed_cycles": 0,
+        "last_cycle_ms": null,
+        "last_error": null
+      },
+      "private_bridge": "running",
+      "collection_interval_seconds": 15.0
+    },
+    "status_catalog": {
+      "known_wzml_statuses": {
+        "Download": "downloading",
+        "Upload": "uploading",
+        "Clone": "cloning",
+        "QueueDl": "download_queue",
+        "QueueUp": "upload_queue",
+        "Pause": "paused",
+        "Archive": "archiving",
+        "Extract": "extracting",
+        "Split": "splitting",
+        "CheckUp": "checking",
+        "Seed": "seeding",
+        "SamVid": "sample_video",
+        "Convert": "converting",
+        "FFmpeg": "ffmpeg_processing",
+        "YouTube": "youtube_processing",
+        "Metadata": "metadata_processing"
+      },
+      "known_engine_native_statuses": {
+        "QuickCheck": "checking",
+        "Verifying": "checking",
+        "Repairing": "checking",
+        "Extracting": "extracting",
+        "Fetching": "other",
+        "Moving": "other"
+      },
+      "observed_statuses": [
+        "Archive",
+        "Download",
+        "FFmpeg",
+        "Metadata",
+        "QueueDl",
+        "Running",
+        "Seed",
+        "Upload",
+        "active",
+        "stalledUP"
+      ],
+      "unknown_state_policy": "Unknown raw values are preserved on the task and normalized to 'other'.",
+      "supported_engines": [
+        "aria2",
+        "direct",
+        "ffmpeg",
+        "gdrive_api",
+        "jdownloader",
+        "mega",
+        "metadata",
+        "qbittorrent",
+        "queue_system",
+        "rclone",
+        "sabnzbd",
+        "seedr",
+        "sevenz",
+        "telegram",
+        "uphoster",
+        "youtube_api",
+        "yt_dlp"
+      ],
+      "capabilities": [
+        "read_only",
+        "snapshot_cache",
+        "pagination",
+        "sections_filter",
+        "lifecycle_events"
+      ]
+    },
+    "summary": {
+      "total_tasks": 17,
+      "by_lifecycle": {
+        "running": 15,
+        "unknown": 1,
+        "queued": 1
+      },
+      "by_stage": {
+        "downloading": 6,
+        "seeding": 1,
+        "unknown": 1,
+        "other": 1,
+        "uploading": 4,
+        "ffmpeg_processing": 1,
+        "archiving": 1,
+        "metadata_processing": 1,
+        "download_queue": 1
+      },
+      "by_wzml_status": {
+        "Download": 6,
+        "Seed": 1,
+        "unknown": 1,
+        "Running": 1,
+        "Upload": 4,
+        "FFmpeg": 1,
+        "Archive": 1,
+        "Metadata": 1,
+        "QueueDl": 1
+      },
+      "by_engine": {
+        "aria2": 1,
+        "qbittorrent": 1,
+        "sabnzbd": 1,
+        "jdownloader": 1,
+        "seedr": 1,
+        "direct": 1,
+        "gdrive_api": 1,
+        "telegram": 1,
+        "uphoster": 1,
+        "youtube_api": 1,
+        "yt_dlp": 1,
+        "ffmpeg": 1,
+        "sevenz": 1,
+        "metadata": 1,
+        "mega": 1,
+        "rclone": 1,
+        "queue_system": 1
+      },
+      "download_queue_length": 1,
+      "upload_queue_length": 0,
+      "active_downloads": 0,
+      "active_uploads": 0,
+      "paused": 0,
+      "seeding": 1,
+      "rates": {
+        "download_bps": 83,
+        "upload_bps": 1572930,
+        "seeding_bps": 77
+      },
+      "headline": {
+        "cpu_percent": 0.0,
+        "memory_percent": 7.4,
+        "download_disk_percent": 39.9
+      },
+      "engine_dependency_warning_count": 6
+    },
+    "tasks": [
+      {
+        "task_id": "40fed5fe-68aa2ec1d114",
+        "task_key": "1",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 2
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "aria2",
+          "label": "Aria2",
+          "version": "1.37.0",
+          "task_id": "g1",
+          "hash": "abc123",
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "downloading",
+          "wzml_status": "Download",
+          "engine_status": "active",
+          "normalized_status": "downloading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 25.0,
+          "processed_bytes": 250,
+          "total_bytes": 1000,
+          "remaining_bytes": 750,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": 50,
+          "upload_bps": 5,
+          "seeding_bps": null,
+          "source": "engine_snapshot",
+          "quality": "engine_snapshot"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 15,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": "abc123",
+          "seeders": 3,
+          "leechers": 4,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "engine_gid",
+          "eta",
+          "progress",
+          "seeding",
+          "speed",
+          "torrent"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-1a05146e6280",
+        "task_key": "2",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 3
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#qBit",
+          "normalized": "torrent"
+        },
+        "output_mode": {
+          "raw": "#Leech",
+          "normalized": "telegram"
+        },
+        "engine": {
+          "id": "qbittorrent",
+          "label": "qBittorrent",
+          "version": "5.0.0",
+          "task_id": null,
+          "hash": "h1",
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "seeding",
+          "wzml_status": "Seed",
+          "engine_status": "stalledUP",
+          "normalized_status": "seeding",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 100,
+          "processed_bytes": 500,
+          "total_bytes": 500,
+          "remaining_bytes": 0,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": null,
+          "seeding_bps": 77,
+          "source": "engine_snapshot",
+          "quality": "engine_snapshot"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": null,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": true,
+          "hash": "h1",
+          "seeders": 2,
+          "leechers": 1,
+          "uploaded_bytes": 900,
+          "ratio": 1.8,
+          "seeding_seconds": 60
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "engine_hash",
+          "progress",
+          "seeding",
+          "speed",
+          "torrent"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-06ab24e68d2f",
+        "task_key": "3",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 4
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "sabnzbd",
+          "label": "SABnzbd",
+          "version": "4.0",
+          "task_id": "nzo1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "unknown",
+          "stage": "unknown",
+          "wzml_status": null,
+          "engine_status": null,
+          "normalized_status": "unknown",
+          "cancel_requested": false,
+          "known_status": false
+        },
+        "progress": {
+          "percent": null,
+          "processed_bytes": null,
+          "total_bytes": null,
+          "remaining_bytes": null,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_cache",
+          "quality": "unavailable"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": null,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "engine_gid"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-59acd1d1f0d2",
+        "task_key": "4",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 5
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "jdownloader",
+          "label": "JDownloader",
+          "version": "2",
+          "task_id": "jd1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "other",
+          "wzml_status": "Running",
+          "engine_status": "Running",
+          "normalized_status": "other",
+          "cancel_requested": false,
+          "known_status": false
+        },
+        "progress": {
+          "percent": 50.0,
+          "processed_bytes": 50,
+          "total_bytes": 100,
+          "remaining_bytes": 50,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": 10,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_cache",
+          "quality": "cached"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": null,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "engine_gid",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-2e5bdc4bc832",
+        "task_key": "5",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 6
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "seedr",
+          "label": "Seedr",
+          "version": null,
+          "task_id": "77",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "downloading",
+          "wzml_status": "Download",
+          "engine_status": null,
+          "normalized_status": "downloading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 50,
+          "processed_bytes": 100,
+          "total_bytes": 200,
+          "remaining_bytes": 100,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": 5,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_cache",
+          "quality": "cached"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 3,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "engine_gid",
+          "eta",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-87a76385ce30",
+        "task_key": "6",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 7
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "direct",
+          "label": "Direct link",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "downloading",
+          "wzml_status": "Download",
+          "engine_status": null,
+          "normalized_status": "downloading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 10.0,
+          "processed_bytes": 100,
+          "total_bytes": 1000,
+          "remaining_bytes": 900,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": 10,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 90,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "eta",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-2ac9cb8fe2da",
+        "task_key": "7",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 8
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "gdrive_api",
+          "label": "Google Drive API",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "uploading",
+          "wzml_status": "Upload",
+          "engine_status": null,
+          "normalized_status": "uploading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 30.0,
+          "processed_bytes": 300,
+          "total_bytes": 1000,
+          "remaining_bytes": 700,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": 30,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 23,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "engine_gid",
+          "eta",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-2b3392dd11e5",
+        "task_key": "8",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 9
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "telegram",
+          "label": "Telegram",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "uploading",
+          "wzml_status": "Upload",
+          "engine_status": null,
+          "normalized_status": "uploading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 30.0,
+          "processed_bytes": 300,
+          "total_bytes": 1000,
+          "remaining_bytes": 700,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": 30,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 23,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "eta",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-2b8e81131186",
+        "task_key": "9",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 10
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "uphoster",
+          "label": "Uphoster",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "uploading",
+          "wzml_status": "Upload",
+          "engine_status": null,
+          "normalized_status": "uploading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 10.0,
+          "processed_bytes": 1,
+          "total_bytes": 10,
+          "remaining_bytes": 9,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": 1,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 9,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "engine_gid",
+          "eta",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-1c83b36c2b64",
+        "task_key": "10",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 11
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "youtube_api",
+          "label": "YouTube API",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "downloading",
+          "wzml_status": "Download",
+          "engine_status": null,
+          "normalized_status": "downloading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 10.0,
+          "processed_bytes": 1,
+          "total_bytes": 10,
+          "remaining_bytes": 9,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": 1,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 9,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "eta",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-9e4d1bbdb3c6",
+        "task_key": "11",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 12
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "yt_dlp",
+          "label": "yt-dlp",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "downloading",
+          "wzml_status": "Download",
+          "engine_status": null,
+          "normalized_status": "downloading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 50,
+          "processed_bytes": 50,
+          "total_bytes": 100,
+          "remaining_bytes": 50,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": 5,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 10,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "eta",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-c689bcf0de3c",
+        "task_key": "12",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 13
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "ffmpeg",
+          "label": "FFmpeg",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "ffmpeg_processing",
+          "wzml_status": "FFmpeg",
+          "engine_status": null,
+          "normalized_status": "ffmpeg_processing",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 10,
+          "processed_bytes": 10,
+          "total_bytes": 1000,
+          "remaining_bytes": 990,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 5,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": "ffmpeg_processing",
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "eta",
+          "progress"
+        ],
+        "extensions": {
+          "ffmpeg": {
+            "processing_bps": 2
+          }
+        }
+      },
+      {
+        "task_id": "40fed5fe-2f265c561d9d",
+        "task_key": "13",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 14
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "sevenz",
+          "label": "7-Zip",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "archiving",
+          "wzml_status": "Archive",
+          "engine_status": null,
+          "normalized_status": "archiving",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 10,
+          "processed_bytes": 10,
+          "total_bytes": 1000,
+          "remaining_bytes": 990,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": null,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": "archiving",
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "progress"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-54db4814d0bb",
+        "task_key": "14",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 15
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "metadata",
+          "label": "Metadata",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "metadata_processing",
+          "wzml_status": "Metadata",
+          "engine_status": null,
+          "normalized_status": "metadata_processing",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 1,
+          "processed_bytes": 1,
+          "total_bytes": 1000,
+          "remaining_bytes": 999,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 1,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": "metadata_processing",
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "eta",
+          "progress"
+        ],
+        "extensions": {
+          "metadata": {
+            "processing_bps": 1
+          }
+        }
+      },
+      {
+        "task_id": "40fed5fe-6314d87a8c33",
+        "task_key": "15",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 16
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "mega",
+          "label": "MEGA",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "downloading",
+          "wzml_status": "Download",
+          "engine_status": null,
+          "normalized_status": "downloading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 10.0,
+          "processed_bytes": 10,
+          "total_bytes": 100,
+          "remaining_bytes": 90,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": 2,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": 45,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "engine_gid",
+          "eta",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-8845ad8645bc",
+        "task_key": "16",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 17
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "rclone",
+          "label": "Rclone",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "running",
+          "stage": "uploading",
+          "wzml_status": "Upload",
+          "engine_status": null,
+          "normalized_status": "uploading",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 50,
+          "processed_bytes": 536870912,
+          "total_bytes": 1073741824,
+          "remaining_bytes": 536870912,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": 1572864,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": null,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": null,
+        "capabilities": [
+          "bytes",
+          "engine_gid",
+          "progress",
+          "speed"
+        ],
+        "extensions": {}
+      },
+      {
+        "task_id": "40fed5fe-1348f6484a93",
+        "task_key": "17",
+        "instance_id": "default",
+        "boot_id": "40fed5fe2c9b4f7b8b1a9df1099e9362",
+        "origin": {
+          "platform": "telegram",
+          "chat_id": -100123,
+          "message_id": 18
+        },
+        "name": "file.mkv",
+        "sub_name": null,
+        "input_mode": {
+          "raw": "#Aria2",
+          "normalized": "direct_link"
+        },
+        "output_mode": {
+          "raw": "#GDrive",
+          "normalized": "google_drive"
+        },
+        "engine": {
+          "id": "queue_system",
+          "label": "Queue system",
+          "version": null,
+          "task_id": "x1",
+          "hash": null,
+          "health": "unknown"
+        },
+        "state": {
+          "lifecycle": "queued",
+          "stage": "download_queue",
+          "wzml_status": "QueueDl",
+          "engine_status": null,
+          "normalized_status": "download_queue",
+          "cancel_requested": false,
+          "known_status": true
+        },
+        "progress": {
+          "percent": 0,
+          "processed_bytes": 0,
+          "total_bytes": 1000,
+          "remaining_bytes": 1000,
+          "files": {
+            "processed": null,
+            "total": null
+          }
+        },
+        "transfer": {
+          "download_bps": null,
+          "upload_bps": null,
+          "seeding_bps": null,
+          "source": "wrapper_attributes",
+          "quality": "wrapper_attributes"
+        },
+        "timing": {
+          "started_at": "2026-11-22T14:05:10.498Z",
+          "updated_at": "2026-11-22T14:05:30.499Z",
+          "elapsed_seconds": 30.0,
+          "eta_seconds": null,
+          "queue_wait_seconds": null
+        },
+        "torrent": {
+          "is_torrent": false,
+          "hash": null,
+          "seeders": null,
+          "leechers": null,
+          "uploaded_bytes": null,
+          "ratio": null,
+          "seeding_seconds": null
+        },
+        "processing": {
+          "operation": null,
+          "current_item": null,
+          "file_count": 0,
+          "completed_files": null,
+          "current_sub_name": null
+        },
+        "queue_position": 1,
+        "capabilities": [
+          "bytes",
+          "progress"
+        ],
+        "extensions": {}
+      }
+    ],
+    "queues": {
+      "download": {
+        "length": 1,
+        "active": 0,
+        "capacity": 2,
+        "unlimited": false,
+        "available_slots": 2,
+        "items": [
+          {
+            "task_id": "40fed5fe-1348f6484a93",
+            "task_key": "17",
+            "position": 1,
+            "name": "file.mkv",
+            "wzml_status": "QueueDl",
+            "intended_stage": "download_queue",
+            "enqueued_at": null,
+            "queue_age_seconds": null
+          }
+        ]
+      },
+      "upload": {
+        "length": 0,
+        "active": 0,
+        "capacity": null,
+        "unlimited": true,
+        "available_slots": null,
+        "items": []
+      },
+      "overall_capacity": null
+    },
+    "engines": [
+      {
+        "id": "aria2",
+        "display_name": "Aria2",
+        "configured": true,
+        "enabled": true,
+        "initialized": true,
+        "connected": true,
+        "health": "healthy",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": [
+          "direct links",
+          "torrent metadata"
+        ]
+      },
+      {
+        "id": "qbittorrent",
+        "display_name": "qBittorrent",
+        "configured": true,
+        "enabled": true,
+        "initialized": true,
+        "connected": true,
+        "health": "healthy",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": [
+          "torrents"
+        ]
+      },
+      {
+        "id": "sabnzbd",
+        "display_name": "SABnzbd",
+        "configured": true,
+        "enabled": true,
+        "initialized": false,
+        "connected": false,
+        "health": "unavailable",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": {
+          "code": "NOT_INITIALIZED",
+          "message": "SABnzbd client is not initialized"
+        },
+        "required_by_enabled_features": [
+          "usenet"
+        ]
+      },
+      {
+        "id": "jdownloader",
+        "display_name": "JDownloader",
+        "configured": false,
+        "enabled": true,
+        "initialized": false,
+        "connected": false,
+        "health": "disabled",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      },
+      {
+        "id": "mega",
+        "display_name": "MEGA",
+        "configured": false,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "disabled",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      },
+      {
+        "id": "seedr",
+        "display_name": "Seedr",
+        "configured": false,
+        "enabled": false,
+        "initialized": null,
+        "connected": null,
+        "health": "disabled",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      },
+      {
+        "id": "rclone",
+        "display_name": "Rclone",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unavailable",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": [
+          "rclone transfers"
+        ]
+      },
+      {
+        "id": "ffmpeg",
+        "display_name": "FFmpeg",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unavailable",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": [
+          "media processing"
+        ]
+      },
+      {
+        "id": "sevenz",
+        "display_name": "7-Zip",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unavailable",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": [
+          "archive/extract"
+        ]
+      },
+      {
+        "id": "yt_dlp",
+        "display_name": "yt-dlp",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unknown",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      },
+      {
+        "id": "gdrive_api",
+        "display_name": "Google Drive API",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unknown",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      },
+      {
+        "id": "telegram",
+        "display_name": "Telegram",
+        "configured": true,
+        "enabled": true,
+        "initialized": true,
+        "connected": true,
+        "health": "healthy",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": [
+          "all tasks"
+        ]
+      },
+      {
+        "id": "uphoster",
+        "display_name": "Uphoster",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unknown",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      },
+      {
+        "id": "direct",
+        "display_name": "Direct link",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unknown",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      },
+      {
+        "id": "youtube_api",
+        "display_name": "YouTube API",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unknown",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      },
+      {
+        "id": "metadata",
+        "display_name": "Metadata",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unknown",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      },
+      {
+        "id": "queue_system",
+        "display_name": "Queue system",
+        "configured": true,
+        "enabled": true,
+        "initialized": null,
+        "connected": null,
+        "health": "unknown",
+        "version": null,
+        "capabilities": [],
+        "last_checked_at": "2026-11-22T14:05:30.665Z",
+        "last_error": null,
+        "required_by_enabled_features": []
+      }
+    ],
+    "dependencies": [
+      {
+        "id": "aria2",
+        "display_name": "Aria2",
+        "executable": "definitely-missing-aria",
+        "found": false,
+        "executable_permission": false,
+        "version": null,
+        "probe_result": "not_found",
+        "criticality": "critical",
+        "features": [
+          "direct links",
+          "torrents (metadata/seeding)"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.523Z"
+      },
+      {
+        "id": "qbittorrent",
+        "display_name": "qBittorrent",
+        "executable": "nope-qb",
+        "found": false,
+        "executable_permission": false,
+        "version": null,
+        "probe_result": "not_found",
+        "criticality": "required",
+        "features": [
+          "torrents"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.524Z"
+      },
+      {
+        "id": "ffmpeg",
+        "display_name": "FFmpeg",
+        "executable": "nope-ff",
+        "found": false,
+        "executable_permission": false,
+        "version": null,
+        "probe_result": "not_found",
+        "criticality": "important",
+        "features": [
+          "convert",
+          "sample video",
+          "ffmpeg cmds",
+          "metadata"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.524Z"
+      },
+      {
+        "id": "rclone",
+        "display_name": "Rclone",
+        "executable": "nope-rc",
+        "found": false,
+        "executable_permission": false,
+        "version": null,
+        "probe_result": "not_found",
+        "criticality": "important",
+        "features": [
+          "rclone upload/download",
+          "clone"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.524Z"
+      },
+      {
+        "id": "sabnzbd",
+        "display_name": "SABnzbd",
+        "executable": "nope-sab",
+        "found": false,
+        "executable_permission": false,
+        "version": null,
+        "probe_result": "not_found",
+        "criticality": "optional",
+        "features": [
+          "usenet"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.524Z"
+      },
+      {
+        "id": "ffprobe",
+        "display_name": "ffprobe",
+        "executable": "ffprobe",
+        "found": true,
+        "executable_permission": true,
+        "version": "ffprobe version 6.1.1-3ubuntu5 Copyright (c) 2007-2023 the FFmpeg developers",
+        "probe_result": "ok",
+        "criticality": "important",
+        "features": [
+          "media info",
+          "split"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.621Z"
+      },
+      {
+        "id": "sevenz",
+        "display_name": "7-Zip",
+        "executable": "7z",
+        "found": false,
+        "executable_permission": false,
+        "version": null,
+        "probe_result": "not_found",
+        "criticality": "important",
+        "features": [
+          "archive",
+          "extract"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.621Z"
+      },
+      {
+        "id": "split",
+        "display_name": "split",
+        "executable": "split",
+        "found": true,
+        "executable_permission": true,
+        "version": "split (GNU coreutils) 9.4",
+        "probe_result": "ok",
+        "criticality": "optional",
+        "features": [
+          "file splitting"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.623Z"
+      },
+      {
+        "id": "java",
+        "display_name": "Java runtime",
+        "executable": "java",
+        "found": true,
+        "executable_permission": true,
+        "version": "Picked up JAVA_TOOL_OPTIONS: -XX:+IgnoreUnrecognizedVMOptions -XX:-UseBASE64Intrinsics",
+        "probe_result": "ok",
+        "criticality": "optional",
+        "features": [
+          "jdownloader"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.661Z"
+      },
+      {
+        "id": "cpulimit",
+        "display_name": "cpulimit",
+        "executable": "cpulimit",
+        "found": false,
+        "executable_permission": false,
+        "version": null,
+        "probe_result": "not_found",
+        "criticality": "optional",
+        "features": [
+          "sabnzbd cpu limiting"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.661Z"
+      },
+      {
+        "id": "taskset",
+        "display_name": "taskset",
+        "executable": "taskset",
+        "found": true,
+        "executable_permission": true,
+        "version": "taskset from util-linux 2.39.3",
+        "probe_result": "ok",
+        "criticality": "optional",
+        "features": [
+          "cpu pinning"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.664Z"
+      },
+      {
+        "id": "megacmd",
+        "display_name": "MEGAcmd",
+        "executable": "mega-version",
+        "found": false,
+        "executable_permission": false,
+        "version": null,
+        "probe_result": "not_found",
+        "criticality": "optional",
+        "features": [
+          "mega"
+        ],
+        "last_checked_at": "2026-11-22T14:05:30.664Z"
+      }
+    ],
+    "system": {
+      "cpu": {
+        "percent": 0.0,
+        "logical_cores": 1,
+        "physical_cores": 1,
+        "usable_cores": 1,
+        "frequency_mhz": 2100.0,
+        "load_average": {
+          "1m": 0.12,
+          "5m": 0.06,
+          "15m": 0.01
+        }
+      },
+      "memory": {
+        "total_bytes": 4186202112,
+        "used_bytes": 308768768,
+        "available_bytes": 3877433344,
+        "percent": 7.4
+      },
+      "swap": {
+        "total_bytes": 0,
+        "used_bytes": 0,
+        "free_bytes": 0,
+        "percent": 0.0
+      },
+      "filesystem": {
+        "root": {
+          "total_bytes": 270553174016,
+          "used_bytes": 7081324544,
+          "free_bytes": 10655584256,
+          "percent": 39.9
+        },
+        "downloads": {
+          "total_bytes": 270553174016,
+          "used_bytes": 7081324544,
+          "free_bytes": 10655584256,
+          "percent": 39.9
+        },
+        "same_device": true
+      },
+      "disk_io": {
+        "read_bytes_total": 157546496,
+        "write_bytes_total": 67215360,
+        "read_bps": null,
+        "write_bps": null,
+        "read_time_ms": 870,
+        "write_time_ms": 486
+      },
+      "network": {
+        "scope": "host_or_container",
+        "bytes_sent_total": 418889,
+        "bytes_recv_total": 17459472,
+        "packets_sent_total": 1032,
+        "packets_recv_total": 1434,
+        "send_bps": null,
+        "recv_bps": null
+      },
+      "runtime": {
+        "pid": 1655,
+        "uptime_seconds": 0,
+        "rss_bytes": 33869824,
+        "cpu_percent": 0.0,
+        "threads": 2,
+        "host_uptime_seconds": 330
+      },
+      "os": {
+        "system": "Linux",
+        "release": "6.18.44-fc-v726",
+        "version": "#1 SMP PREEMPT_DYNAMIC @0",
+        "architecture": "x86_64",
+        "python": "3.12.3"
+      },
+      "processes": [
+        {
+          "name": "python",
+          "pid": 1655,
+          "cpu_percent": 0,
+          "memory_percent": 0.8
+        },
+        {
+          "name": "rclone-filestore",
+          "pid": 65,
+          "cpu_percent": 0,
+          "memory_percent": 0.7
+        },
+        {
+          "name": "process_api",
+          "pid": 1,
+          "cpu_percent": 0,
+          "memory_percent": 0.1
+        },
+        {
+          "name": "6",
+          "pid": 64,
+          "cpu_percent": 0,
+          "memory_percent": 0.1
+        },
+        {
+          "name": "kthreadd",
+          "pid": 2,
+          "cpu_percent": 0,
+          "memory_percent": 0
+        },
+        {
+          "name": "pool_workqueue_release",
+          "pid": 3,
+          "cpu_percent": 0,
+          "memory_percent": 0
+        },
+        {
+          "name": "kworker/R-rcu_gp",
+          "pid": 4,
+          "cpu_percent": 0,
+          "memory_percent": 0
+        },
+        {
+          "name": "kworker/R-sync_wq",
+          "pid": 5,
+          "cpu_percent": 0,
+          "memory_percent": 0
+        },
+        {
+          "name": "kworker/R-kvfree_rcu_reclaim",
+          "pid": 6,
+          "cpu_percent": 0,
+          "memory_percent": 0
+        },
+        {
+          "name": "kworker/R-slub_flushwq",
+          "pid": 7,
+          "cpu_percent": 0,
+          "memory_percent": 0
+        }
+      ]
+    },
+    "transfer": {
+      "task_engine": {
+        "per_task": "see tasks[].transfer",
+        "per_engine": {
+          "aria2": {
+            "download_bps": 50,
+            "upload_bps": 5,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "qbittorrent": {
+            "download_bps": 0,
+            "upload_bps": 0,
+            "seeding_bps": 77,
+            "tasks": 1
+          },
+          "sabnzbd": {
+            "download_bps": 0,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "jdownloader": {
+            "download_bps": 10,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "seedr": {
+            "download_bps": 5,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "direct": {
+            "download_bps": 10,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "gdrive_api": {
+            "download_bps": 0,
+            "upload_bps": 30,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "telegram": {
+            "download_bps": 0,
+            "upload_bps": 30,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "uphoster": {
+            "download_bps": 0,
+            "upload_bps": 1,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "youtube_api": {
+            "download_bps": 1,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "yt_dlp": {
+            "download_bps": 5,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "ffmpeg": {
+            "download_bps": 0,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "sevenz": {
+            "download_bps": 0,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "metadata": {
+            "download_bps": 0,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "mega": {
+            "download_bps": 2,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "rclone": {
+            "download_bps": 0,
+            "upload_bps": 1572864,
+            "seeding_bps": 0,
+            "tasks": 1
+          },
+          "queue_system": {
+            "download_bps": 0,
+            "upload_bps": 0,
+            "seeding_bps": 0,
+            "tasks": 1
+          }
+        },
+        "overall": {
+          "download_bps": 83,
+          "upload_bps": 1572930,
+          "seeding_bps": 77
+        },
+        "engine_native_aggregate": {
+          "aria2": {
+            "download_bps": 5000,
+            "upload_bps": 100,
+            "provenance": "engine_global_stat"
+          },
+          "qbittorrent": {
+            "download_bps": 111,
+            "upload_bps": 222,
+            "provenance": "engine_global_stat"
+          }
+        },
+        "method": "sum of per-task rates from adapters; engine aggregates reported separately and are NOT added to avoid double counting"
+      },
+      "host_network": {
+        "scope": "host_or_container",
+        "note": "Host/container-wide traffic; not WZML-only.",
+        "bytes_sent_total": 418889,
+        "bytes_recv_total": 17459472,
+        "packets_sent_total": 1032,
+        "packets_recv_total": 1434,
+        "send_bps": null,
+        "recv_bps": null
+      },
+      "bandwidth_accounting": {
+        "source": "wzml_accounting_counters_read_only",
+        "period_start": null,
+        "period_end": null,
+        "monthly_limit_bytes": 107374182400,
+        "used_bytes": 1091620185,
+        "percent_used": 1.02,
+        "alert_state": "ok",
+        "available": true,
+        "meaning": "host/container network bytes accumulated by WZML's own counter"
+      }
+    },
+    "limits": {
+      "DIRECT_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "TORRENT_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "GD_DL_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "RC_DL_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "CLONE_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "JD_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "NZB_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "YTDLP_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "PLAYLIST_LIMIT": {
+        "value": null,
+        "unit": "items",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "MEGA_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "SEEDR_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "LEECH_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "ARCHIVE_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "EXTRACT_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "task",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "STORAGE_LIMIT": {
+        "value": null,
+        "unit": "GB",
+        "scope": "storage",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "minimum free storage threshold; 0 = disabled"
+      },
+      "MONTHLY_BANDWIDTH": {
+        "value": 100,
+        "unit": "GB",
+        "scope": "bandwidth",
+        "source": "config",
+        "unlimited_or_disabled": false,
+        "note": "0 = disabled"
+      },
+      "USER_TIME_INTERVAL": {
+        "value": null,
+        "unit": "seconds",
+        "scope": "user",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = disabled"
+      },
+      "USER_MAX_TASKS": {
+        "value": null,
+        "unit": "tasks",
+        "scope": "user",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "BOT_MAX_TASKS": {
+        "value": null,
+        "unit": "tasks",
+        "scope": "bot",
+        "source": "config",
+        "unlimited_or_disabled": null,
+        "note": "0 = unlimited"
+      },
+      "QUEUE_ALL": {
+        "value": 0,
+        "unit": "tasks",
+        "scope": "queue",
+        "source": "config",
+        "unlimited_or_disabled": true,
+        "note": "0 = unlimited"
+      },
+      "QUEUE_DOWNLOAD": {
+        "value": 2,
+        "unit": "tasks",
+        "scope": "queue",
+        "source": "config",
+        "unlimited_or_disabled": false,
+        "note": "0 = unlimited"
+      },
+      "QUEUE_UPLOAD": {
+        "value": 0,
+        "unit": "tasks",
+        "scope": "queue",
+        "source": "config",
+        "unlimited_or_disabled": true,
+        "note": "0 = unlimited"
+      },
+      "STATUS_LIMIT": {
+        "value": 10,
+        "unit": "tasks_per_page",
+        "scope": "status_ui",
+        "source": "config",
+        "unlimited_or_disabled": false,
+        "note": "tasks shown per /status page"
+      },
+      "STATUS_UPDATE_INTERVAL": {
+        "value": 15,
+        "unit": "seconds",
+        "scope": "status_ui",
+        "source": "config",
+        "unlimited_or_disabled": false,
+        "note": "WZML status refresh interval"
+      }
+    },
+    "software": {
+      "python": "3.12.3",
+      "packages": {
+        "pyrotgfork": null,
+        "aiohttp": "3.14.5",
+        "aioaria2": null,
+        "aioqbt": null,
+        "yt-dlp": null,
+        "fastapi": "0.165.0",
+        "uvicorn": "0.54.0",
+        "gunicorn": null,
+        "httpx": "0.28.1",
+        "psutil": "7.2.2",
+        "pymongo": null,
+        "google-api-python-client": null,
+        "qbittorrent-api": null,
+        "apscheduler": null
+      },
+      "native": {
+        "aria2": {
+          "version": null,
+          "found": false
+        },
+        "qbittorrent": {
+          "version": null,
+          "found": false
+        },
+        "ffmpeg": {
+          "version": null,
+          "found": false
+        },
+        "rclone": {
+          "version": null,
+          "found": false
+        },
+        "sabnzbd": {
+          "version": null,
+          "found": false
+        },
+        "ffprobe": {
+          "version": "ffprobe version 6.1.1-3ubuntu5 Copyright (c) 2007-2023 the FFmpeg developers",
+          "found": true
+        },
+        "sevenz": {
+          "version": null,
+          "found": false
+        },
+        "split": {
+          "version": "split (GNU coreutils) 9.4",
+          "found": true
+        },
+        "java": {
+          "version": "Picked up JAVA_TOOL_OPTIONS: -XX:+IgnoreUnrecognizedVMOptions -XX:-UseBASE64Intrinsics",
+          "found": true
+        },
+        "cpulimit": {
+          "version": null,
+          "found": false
+        },
+        "taskset": {
+          "version": "taskset from util-linux 2.39.3",
+          "found": true
+        },
+        "megacmd": {
+          "version": null,
+          "found": false
+        }
+      },
+      "engine_versions_reported_by_wzml": {
+        "aria2": "1.37"
+      },
+      "wzml": {
+        "version": null,
+        "commit": null,
+        "upstream_branch": "status-dev"
+      },
+      "last_update_at": null
+    },
+    "events": {
+      "recent": [
+        {
+          "task_id": "40fed5fe-03d51c0003ee",
+          "task_key": "99",
+          "event_type": "task.started",
+          "time": "2026-11-22T14:05:30.499Z",
+          "ts_epoch": 1795356330.4997845,
+          "stage": "downloading",
+          "outcome": null,
+          "origin": {
+            "platform": "telegram",
+            "chat_id": -100123,
+            "message_id": 100
+          },
+          "name": "Example.mkv",
+          "metrics": {
+            "size_bytes": 1000,
+            "duration_seconds": 20.0,
+            "avg_download_bps": 10,
+            "avg_upload_bps": 5
+          },
+          "sequence": 1,
+          "event_id": "40fed5fe-1"
+        },
+        {
+          "task_id": "40fed5fe-03d51c0003ee",
+          "task_key": "99",
+          "event_type": "task.stage_completed",
+          "time": "2026-11-22T14:05:30.499Z",
+          "ts_epoch": 1795356330.4998672,
+          "stage": "downloading",
+          "outcome": null,
+          "origin": {
+            "platform": "telegram",
+            "chat_id": -100123,
+            "message_id": 100
+          },
+          "name": "Example.mkv",
+          "metrics": {
+            "size_bytes": 1000,
+            "duration_seconds": 20.0,
+            "avg_download_bps": 10,
+            "avg_upload_bps": 5
+          },
+          "sequence": 2,
+          "event_id": "40fed5fe-2"
+        },
+        {
+          "task_id": "40fed5fe-03d51c0003ee",
+          "task_key": "99",
+          "event_type": "task.succeeded",
+          "time": "2026-11-22T14:05:30.499Z",
+          "ts_epoch": 1795356330.4998882,
+          "stage": "uploading",
+          "outcome": "succeeded",
+          "origin": {
+            "platform": "telegram",
+            "chat_id": -100123,
+            "message_id": 100
+          },
+          "name": "Example.mkv",
+          "metrics": {
+            "size_bytes": 1000,
+            "duration_seconds": 20.0,
+            "avg_download_bps": 10,
+            "avg_upload_bps": 5
+          },
+          "sequence": 3,
+          "event_id": "40fed5fe-3"
+        }
+      ],
+      "history": {
+        "mode": "memory_only",
+        "durable": false,
+        "retention_days": 30,
+        "last_write_at": null,
+        "written_total": 0,
+        "failed_batches": 0,
+        "last_error": null
+      },
+      "buffer": {
+        "recorded_total": 3,
+        "buffered_recent": 3,
+        "write_backlog": 0,
+        "queue_capacity": 1000,
+        "dropped_non_terminal": 0,
+        "dropped_terminal": 0,
+        "coalesced": 0
+      },
+      "event_types_note": "task.stopped is reserved; WZML flags are used to classify cancel vs failure."
+    },
+    "warnings": [
+      {
+        "code": "DEPENDENCY_MISSING",
+        "section": "dependencies",
+        "severity": "warning",
+        "message": "Aria2 executable 'definitely-missing-aria' was not found on PATH"
+      },
+      {
+        "code": "DEPENDENCY_MISSING",
+        "section": "dependencies",
+        "severity": "warning",
+        "message": "qBittorrent executable 'nope-qb' was not found on PATH"
+      },
+      {
+        "code": "ENGINE_UNHEALTHY",
+        "section": "engines",
+        "severity": "warning",
+        "message": "SABnzbd is unavailable"
+      },
+      {
+        "code": "ENGINE_UNHEALTHY",
+        "section": "engines",
+        "severity": "warning",
+        "message": "Rclone is unavailable"
+      },
+      {
+        "code": "ENGINE_UNHEALTHY",
+        "section": "engines",
+        "severity": "warning",
+        "message": "FFmpeg is unavailable"
+      },
+      {
+        "code": "ENGINE_UNHEALTHY",
+        "section": "engines",
+        "severity": "warning",
+        "message": "7-Zip is unavailable"
+      }
+    ]
+  },
+  "meta": {
+    "request_id": "<request-id>",
+    "snapshot_id": "93ad8ada006841f3",
+    "generated_at": "2026-11-22T14:05:30.499Z",
+    "served_at": "2026-11-22T14:05:30.673Z",
+    "age_ms": 0,
+    "is_stale": false,
+    "is_partial": false,
+    "sections": {
+      "tasks": "ok",
+      "queues": "ok",
+      "system": "ok",
+      "dependencies": "ok",
+      "engines": "ok",
+      "software": "ok",
+      "limits": "ok",
+      "transfer": "ok",
+      "summary": "ok",
+      "events": "ok"
+    },
+    "collection": {
+      "duration_ms": 173.6,
+      "interval_seconds": 15.0,
+      "lock_wait_ms": 0.04,
+      "lock_used": true,
+      "cycles": 1
+    },
+    "warnings": [
+      {
+        "code": "DEPENDENCY_MISSING",
+        "section": "dependencies",
+        "severity": "warning",
+        "message": "Aria2 executable 'definitely-missing-aria' was not found on PATH"
+      },
+      {
+        "code": "DEPENDENCY_MISSING",
+        "section": "dependencies",
+        "severity": "warning",
+        "message": "qBittorrent executable 'nope-qb' was not found on PATH"
+      },
+      {
+        "code": "ENGINE_UNHEALTHY",
+        "section": "engines",
+        "severity": "warning",
+        "message": "SABnzbd is unavailable"
+      },
+      {
+        "code": "ENGINE_UNHEALTHY",
+        "section": "engines",
+        "severity": "warning",
+        "message": "Rclone is unavailable"
+      },
+      {
+        "code": "ENGINE_UNHEALTHY",
+        "section": "engines",
+        "severity": "warning",
+        "message": "FFmpeg is unavailable"
+      },
+      {
+        "code": "ENGINE_UNHEALTHY",
+        "section": "engines",
+        "severity": "warning",
+        "message": "7-Zip is unavailable"
+      }
+    ],
+    "pagination": {
+      "tasks": {
+        "total": 17,
+        "returned": 17,
+        "offset": 0,
+        "truncated": false,
+        "next_cursor": null
+      },
+      "events": {
+        "returned": 3,
+        "limit": 10
+      }
+    }
+  }
+}

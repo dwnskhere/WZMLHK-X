@@ -1,0 +1,101 @@
+openapi: 3.0.3
+info: {title: WZML-HK Monitoring API, version: "1", description: Read-only status snapshot. No control endpoints.}
+servers: [{url: /}]
+paths:
+  /monitor/api/v1/status:
+    get:
+      summary: Full WZML status snapshot (cached, never polls engines per request)
+      security: [{bearerAuth: []}]
+      parameters:
+        - {name: sections, in: query, schema: {type: string, default: all}, description: "comma list of: instance,bot,status_catalog,summary,tasks,queues,engines,dependencies,system,transfer,limits,software,events,warnings"}
+        - {name: tasks_limit, in: query, schema: {type: integer, minimum: 1}}
+        - {name: events_limit, in: query, schema: {type: integer, minimum: 0, maximum: 500}}
+        - {name: cursor, in: query, schema: {type: string}, description: from meta.pagination.tasks.next_cursor}
+      responses:
+        "200": {description: Complete or partial snapshot, content: {application/json: {schema: {$ref: "#/components/schemas/Status"}}}}
+        "400": {$ref: "#/components/responses/Error"}
+        "401": {$ref: "#/components/responses/Error"}
+        "429": {$ref: "#/components/responses/Error"}
+        "503": {$ref: "#/components/responses/Error"}
+        "504": {$ref: "#/components/responses/Error"}
+components:
+  securitySchemes: {bearerAuth: {type: http, scheme: bearer}}
+  responses:
+    Error: {description: Error, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+  schemas:
+    Error:
+      type: object
+      required: [success, api_version, error, meta]
+      properties:
+        success: {type: boolean, enum: [false]}
+        api_version: {type: string}
+        error:
+          type: object
+          properties:
+            code: {type: string, enum: [INVALID_QUERY, INVALID_SECTION, INVALID_CURSOR, UNAUTHORIZED, RATE_LIMITED, MONITOR_NOT_READY, MONITOR_DISABLED, MONITOR_BRIDGE_UNAVAILABLE, MONITOR_BRIDGE_TIMEOUT, MONITOR_INTERNAL_ERROR]}
+            message: {type: string}
+            retryable: {type: boolean}
+            details: {nullable: true}
+        meta: {type: object, properties: {request_id: {type: string}, generated_at: {type: string, format: date-time}}}
+    Status:
+      type: object
+      required: [success, api_version, schema_version, data, meta]
+      properties:
+        success: {type: boolean, enum: [true]}
+        api_version: {type: string, example: "1"}
+        schema_version: {type: string, example: "1.0.0"}
+        data:
+          type: object
+          properties:
+            instance: {type: object}
+            bot: {type: object}
+            status_catalog: {type: object}
+            summary: {type: object}
+            tasks: {type: array, items: {$ref: "#/components/schemas/Task"}}
+            queues: {type: object, properties: {download: {$ref: "#/components/schemas/Queue"}, upload: {$ref: "#/components/schemas/Queue"}}}
+            engines: {type: array, items: {type: object}}
+            dependencies: {type: array, items: {type: object}}
+            system: {type: object}
+            transfer: {type: object}
+            limits: {type: object}
+            software: {type: object}
+            events: {type: object}
+            warnings: {type: array, items: {type: object}}
+        meta:
+          type: object
+          properties:
+            request_id: {type: string}
+            snapshot_id: {type: string}
+            generated_at: {type: string}
+            age_ms: {type: integer}
+            is_stale: {type: boolean}
+            is_partial: {type: boolean}
+            sections: {type: object, additionalProperties: {type: string, enum: [ok, partial, stale, unavailable, not_configured]}}
+            pagination: {type: object}
+            warnings: {type: array, items: {type: object}}
+    Queue:
+      type: object
+      properties: {length: {type: integer}, active: {type: integer}, capacity: {type: integer, nullable: true}, available_slots: {type: integer, nullable: true}, items: {type: array, items: {type: object}}}
+    Task:
+      type: object
+      properties:
+        task_id: {type: string}
+        task_key: {type: string}
+        origin: {type: object, properties: {platform: {type: string}, chat_id: {type: integer, nullable: true}, message_id: {type: integer, nullable: true}}}
+        name: {type: string, nullable: true}
+        engine: {type: object}
+        state:
+          type: object
+          properties:
+            lifecycle: {type: string, enum: [queued, running, paused, succeeded, failed, cancelled, stopped, rejected, unknown]}
+            stage: {type: string}
+            wzml_status: {type: string, nullable: true}
+            engine_status: {type: string, nullable: true}
+            normalized_status: {type: string}
+        progress: {type: object}
+        transfer: {type: object, description: "Unsupported metrics are null"}
+        timing: {type: object}
+        torrent: {type: object}
+        processing: {type: object}
+        capabilities: {type: array, items: {type: string}}
+        extensions: {type: object}
