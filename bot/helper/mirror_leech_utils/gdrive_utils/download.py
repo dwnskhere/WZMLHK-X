@@ -25,6 +25,7 @@ class GoogleDriveDownload(GoogleDriveHelper):
         self._path = path
         super().__init__()
         self.is_downloading = True
+        self.selected_files = getattr(listener, "selected_files", None)
 
     def download(self):
         file_id = self.get_id_from_url(self.listener.link, self.listener.user_id)
@@ -83,6 +84,8 @@ class GoogleDriveDownload(GoogleDriveHelper):
                 mime_type = item.get("mimeType")
             if mime_type == self.G_DRIVE_DIR_MIME_TYPE:
                 self._download_folder(file_id, path, filename)
+            elif self.selected_files is not None and file_id not in self.selected_files:
+                continue
             elif not ospath.isfile(
                 f"{path}{filename}"
             ) and not filename.strip().lower().endswith(

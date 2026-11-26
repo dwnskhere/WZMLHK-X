@@ -9,6 +9,7 @@ LOGGER = getLogger(__name__)
 class GoogleDriveCount(GoogleDriveHelper):
     def __init__(self):
         super().__init__()
+        self.file_items = []
 
     def count(self, link, user_id):
         try:
@@ -35,6 +36,7 @@ class GoogleDriveCount(GoogleDriveHelper):
                     self.alt_auth = True
                     self.use_sa = False
                     LOGGER.error("File not found. Trying with token.pickle...")
+                    self.file_items = []
                     return self.count(link, user_id)
                 msg = "File not found."
             else:
@@ -59,6 +61,14 @@ class GoogleDriveCount(GoogleDriveHelper):
     def _gdrive_file(self, filee):
         size = int(filee.get("size", 0))
         self.proc_bytes += size
+        self.file_items.append(
+            {
+                "id": filee.get("id"),
+                "name": filee.get("name", "Unknown"),
+                "size": size,
+                "mimeType": filee.get("mimeType", ""),
+            }
+        )
 
     def _gdrive_directory(self, drive_folder):
         files = self.get_files_by_folder_id(drive_folder["id"])

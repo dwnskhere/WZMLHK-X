@@ -118,6 +118,11 @@ def add_handlers():
     TgClient.bot.add_handler(
         CallbackQueryHandler(confirm_selection, filters=regex("^sel"))
     )
+    from ..helper.mirror_leech_utils.gdrive_utils.selection import gd_selection_cb
+
+    TgClient.bot.add_handler(
+        CallbackQueryHandler(gd_selection_cb, filters=regex("^gdsel"))
+    )
     TgClient.bot.add_handler(
         MessageHandler(
             remove_from_queue,

@@ -90,10 +90,20 @@ ARCH_EXT = [
 
 
 FIRST_SPLIT_REGEX = (
-    r"\.part0*1\.rar$|\.7z\.0*1$|\.zip\.0*1$|^(?!.*\.part\d+\.rar$).*\.rar$"
+    r"\.part0*1\.rar$"
+    r"|\.7z\.0*1$"
+    r"|\.zip\.0*1$"
+    r"|\.z0*1$"
+    r"|^(?!.*\.part\d+\.rar$).*\.rar$"
 )
 
-SPLIT_REGEX = r"\.r\d+$|\.7z\.\d+$|\.z\d+$|\.zip\.\d+$|\.part\d+\.rar$"
+SPLIT_REGEX = (
+    r"|\.r\d+$"
+    r"|\.7z\.\d+$"
+    r"|\.z\d+$"
+    r"|\.zip\.\d+$"
+    r"|\.part\d+\.rar$"
+)
 
 
 def is_first_archive_split(file):
@@ -180,11 +190,16 @@ async def count_files_and_folders(opath):
 
 
 def get_base_name(orig_path):
+    # Strip URL query or fragment if present in filename
+    cleaned_path = orig_path.split("?", 1)[0].split("#", 1)[0]
     extension = next(
-        (ext for ext in ARCH_EXT if orig_path.strip().lower().endswith(ext)), ""
+        (ext for ext in ARCH_EXT if cleaned_path.strip().lower().endswith(ext)), ""
     )
     if extension != "":
-        return re_split(f"{extension}$", orig_path, maxsplit=1, flags=I)[0]
+        base = re_split(f"{extension}$", cleaned_path, maxsplit=1, flags=I)[0]
+        # Clean multi-part suffixes like .part1, .part01, .z01
+        base = re_split(r"\.part\d+$|\.z\d+$|\.\d+$", base, maxsplit=1, flags=I)[0]
+        return base
     else:
         raise NotSupportedExtractionArchive("File format not supported for extraction")
 

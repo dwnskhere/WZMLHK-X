@@ -9,6 +9,7 @@ from ...ext_utils.task_manager import (
 )
 from ...mirror_leech_utils.gdrive_utils.count import GoogleDriveCount
 from ...mirror_leech_utils.gdrive_utils.download import GoogleDriveDownload
+from ...mirror_leech_utils.gdrive_utils.selection import open_gd_selection
 from ...mirror_leech_utils.status_utils.gdrive_status import GoogleDriveStatus
 from ...mirror_leech_utils.status_utils.queue_status import QueueStatus
 from ...telegram_helper.message_utils import send_status_message
@@ -22,6 +23,21 @@ async def add_gd_download(listener, path):
     if mime_type is None:
         await listener.on_download_error(name)
         return
+
+    # Check if -s (select files) flag was passed on a Google Drive folder
+    if listener.select and mime_type == "Folder" and drive.file_items:
+        if len(drive.file_items) > 1:
+            selected_ids = await open_gd_selection(
+                listener.message, name, drive.file_items
+            )
+            if not selected_ids:
+                listener.is_cancelled = True
+                return
+            listener.selected_files = selected_ids
+            # Recalculate listener.size based only on selected files
+            listener.size = sum(
+                item["size"] for item in drive.file_items if item["id"] in selected_ids
+            )
 
     listener.name = listener.name or name
     gid = token_hex(5)

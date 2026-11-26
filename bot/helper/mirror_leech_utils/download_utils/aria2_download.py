@@ -3,6 +3,7 @@ from aiofiles import open as aiopen
 from base64 import b64encode
 from aiohttp.client_exceptions import ClientError
 from asyncio import TimeoutError
+from urllib.parse import urlparse, unquote
 
 from .... import task_dict_lock, task_dict, LOGGER
 from ....core.config_manager import Config
@@ -39,6 +40,18 @@ async def add_aria2_download(listener, dpath, header, ratio, seed_time):
     a2c_opt = {"dir": dpath}
     if listener.name:
         a2c_opt["out"] = listener.name
+    elif (
+        not listener.link.startswith("magnet:")
+        and not listener.link.endswith(".torrent")
+        and "?" in listener.link
+    ):
+        try:
+            parsed = urlparse(listener.link)
+            clean_name = unquote(parsed.path).rstrip("/").split("/")[-1]
+            if clean_name:
+                a2c_opt["out"] = clean_name
+        except Exception as e:
+            LOGGER.error(f"Error parsing clean name from link: {e}")
     if header:
         a2c_opt["header"] = header
     if ratio:
