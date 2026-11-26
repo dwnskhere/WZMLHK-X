@@ -53,6 +53,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+try:  # optional read-only monitoring API; failure must never affect the web server
+    from web.monitoring_routes import router as _monitor_router
+
+    app.include_router(_monitor_router)
+except Exception as _monitor_exc:
+    getLogger(__name__).warning(f"Monitoring API routes not registered: {_monitor_exc}")
+
 
 templates = Jinja2Templates(directory="web/templates/")
 
